@@ -1,0 +1,13 @@
+/* @tailwind preflight; */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.click-scale-down {
+  transition-duration: 0.1s;
+}
+
+.click-scale-down:active {
+  transition-duration: 0.1s;
+	transform: scale(0.95);
+}

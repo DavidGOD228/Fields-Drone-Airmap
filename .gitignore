@@ -3,6 +3,7 @@
 # dependencies
 /node_modules
 /Drone-win32-x64
+package-lock.json
 
 # testing
 /coverage

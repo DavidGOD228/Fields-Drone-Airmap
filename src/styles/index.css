@@ -11,3 +11,12 @@
   transition-duration: 0.1s;
 	transform: scale(0.95);
 }
+
+.grid-block-container {
+  display: grid;
+  grid-template-columns: 50% 50%;
+}
+
+.grid-block-item {
+  height: 70px;
+}

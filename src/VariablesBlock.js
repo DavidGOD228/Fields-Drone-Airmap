@@ -16,7 +16,8 @@ export default class VariablesBlock extends Component {
         {vars.map(v => (
           <div className="grid-block-item p-4" key={v.name}>
             {/* <FontAwesomeIcon icon={["fas", "fa-ad"]} /> */}
-            {/* <FontAwesomeIcon icon={['fas', 'code']} /> */}
+            {/* <FontAwesomeIcon className="fas fa-ad" /> */}
+            {/* <i class="fas fa-long-arrow-alt-right"></i> */}
             <FontAwesomeIcon className="mr-2" icon={faHome} />
             <span className="text-teal-100">{v.name}</span>
             <p><span className="font-bold">{v.val}</span> {v.measuredIn}</p>

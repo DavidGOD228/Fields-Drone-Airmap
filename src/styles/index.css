@@ -12,6 +12,10 @@
 	transform: scale(0.95);
 }
 
+.transition-duration {
+	transition-duration: 0.5s;
+}
+
 .grid-block-container {
   display: grid;
   grid-template-columns: 50% 50%;
@@ -19,4 +23,25 @@
 
 .grid-block-item {
   height: 70px;
+}
+
+.toggle-button {
+  	/* display: block; */
+	position: relative;
+	top: 48%;
+	left: 94%;
+	background: black;
+	width: fit-content;
+	text-align: center;
+	padding: 2px;
+	border-radius: 50%;
+	width: 35px;
+	height: 35px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.toggle-button svg {
+  margin-left: 10px;
 }

@@ -11428,12 +11428,14 @@ video {
   justify-content: center;
   font-size: 25px;
   color: black;
-  height: 214px;
-  width: 150px;
+  height: 150px;
+  min-width: 100px;
+  max-width: 300px;
   border: 3px dashed black;
   border-radius: 15px;
   margin-right: 10px;
   margin-bottom: 10px;
+  overflow: hidden;
 }
 
 .gallery-file-upload {
@@ -11441,6 +11443,24 @@ video {
   position: absolute;
   top: 0;
   height: 100%;
+  cursor: pointer;
+}
+
+.gallery-file-upload::-webkit-file-upload-button {
+  display: none;
+}
+
+.scroll-top-bottom-button {
+  position: fixed;
+  width: 40px;
+  height: 40px;
+  background: black;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  bottom: 15px;
+  right: 15px;
   cursor: pointer;
 }
 
@@ -54387,3 +54407,4 @@ video {
     z-index: auto;
   }
 }
+

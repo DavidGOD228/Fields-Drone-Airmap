@@ -11412,6 +11412,38 @@ video {
   margin-left: 10px;
 }
 
+.photo-gallery-container {
+  flex-wrap: wrap;
+  width: 100%;
+  display: flex;
+  padding: 30px;
+}
+
+/* flex items-center justify-center */
+
+.photo-gallery-item {
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
+  color: black;
+  height: 214px;
+  width: 150px;
+  border: 3px dashed black;
+  border-radius: 15px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+.gallery-file-upload {
+  width: 100%;
+  position: absolute;
+  top: 0;
+  height: 100%;
+  cursor: pointer;
+}
+
 @media (min-width: 640px) {
   .sm\:sr-only {
     position: absolute;

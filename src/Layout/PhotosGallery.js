@@ -1,4 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 
 //const electron = window.require('electron');ok
 //const app = window.require('electron').remote;
@@ -31,8 +33,30 @@ export default class PhotoGallery extends Component {
 
   render() {
     return (
-      <div className="flex items-center justify-center h-full">
-        <input
+      // <div className="flex items-center justify-center h-full">
+      <div>
+        <div className="photo-gallery-container">
+          <div className="photo-gallery-item ">
+            <input
+              type="file"
+              className="gallery-file-upload"
+              name="file"
+              accept="image/*"
+              onChange={this.onChangeHandler.bind(this)}
+            />
+            <FontAwesomeIcon icon={faPlus} />
+          </div>
+          {this.state.files.map(f => (
+            <div className="photo-gallery-item ">
+              <img
+                src={f}
+                key={f}
+                style={{ width: "100px", height: "150px" }}
+              />
+            </div>
+          ))}
+        </div>
+        {/* <input
           type="file"
           className="fileUpload"
           name="file"
@@ -40,8 +64,8 @@ export default class PhotoGallery extends Component {
           onChange={this.onChangeHandler.bind(this)}
         />
         {this.state.files.map(f => (
-          <img src={f} key={f} style={{ width: '100px', height: '150px' }} />
-        ))}
+          <img src={f} key={f} style={{ width: "100px", height: "150px" }} />
+        ))} */}
       </div>
     );
   }

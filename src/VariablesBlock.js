@@ -10,7 +10,6 @@ export default class VariablesBlock extends Component {
 
   render() {
     const { vars } = this.props
-    console.log(vars)
     return (
       <div className="block grid-block-container">
         {vars.map(v => (

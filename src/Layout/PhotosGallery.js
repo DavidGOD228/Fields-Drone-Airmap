@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faChevronDown, faExpandArrowsAlt } from "@fortawesome/free-solid-svg-icons";
 import ScrollTopBottomButton from "../components/ScrollTopBottomButton"
+{/* <i class="fas fa-expand-arrows-alt"></i> */}
 
 //const electron = window.require('electron');ok
 //const app = window.require('electron').remote;
@@ -12,38 +13,50 @@ export default class PhotoGallery extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      files: []
+      files: [],
+      expandedIdx: -1
     };
   }
 
   onChangeHandler(event) {
-    if (event.target.files[0] != null) {
-      var tempFile = this.state.files;
-      if (tempFile.length == 0)
-        tempFile[0] = URL.createObjectURL(event.target.files[0]);
-      else
-        tempFile[tempFile.length + 1] = URL.createObjectURL(
-          event.target.files[0]
-        );
+    const files = event.target.files;
+    let tempFiles = this.state.files;
 
-      this.setState({
-        files: tempFile
-      });
+    for(let i = 0; i < files.length; i++) {
+      console.log(files[i])
+      tempFiles.push(URL.createObjectURL(files[i]));
     }
+
+    this.setState({
+      files: tempFiles
+    });
+  }
+
+  expandPhoto(idx) {
+    console.log('idx :', idx);
+    this.setState(state => {
+      return {
+        expandedIdx: state.expandedIdx === -1 ? idx : -1
+      }
+    })
   }
 
   render() {
     return (
-      // <div className="flex items-center justify-center h-full">
-      <div>
+      <div className="relative">
         <ScrollTopBottomButton />
         <div className="photo-gallery-container">
-          {this.state.files.map(f => (
-            <div className="photo-gallery-item ">
+          {this.state.files.map((f, idx) => (
+            <div className={`photo-gallery-item ${ this.state.expandedIdx === idx && "photo-gallery-item-expanded"}`}>
+              <div className="photo-expand-button icon-wrapper click-scale-down text-white" onClick={
+                () => this.expandPhoto(idx)
+              }>
+                <FontAwesomeIcon icon={faExpandArrowsAlt} onClick={this.toggleTopBottom}/>
+              </div>
               <img
                 src={f}
-                key={f}
-                // style={{ width: "100px", height: "150px" }}
+                //FIXME: fix this
+                key={Math.random()}
               />
             </div>
           ))}
@@ -54,20 +67,11 @@ export default class PhotoGallery extends Component {
               name="file"
               accept="image/*"
               onChange={this.onChangeHandler.bind(this)}
+              multiple
             />
             <FontAwesomeIcon icon={faPlus} />
           </div>
         </div>
-        {/* <input
-          type="file"
-          className="fileUpload"
-          name="file"
-          accept="image/*"
-          onChange={this.onChangeHandler.bind(this)}
-        />
-        {this.state.files.map(f => (
-          <img src={f} key={f} style={{ width: "100px", height: "150px" }} />
-        ))} */}
       </div>
     );
   }

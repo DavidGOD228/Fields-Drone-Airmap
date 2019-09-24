@@ -11,7 +11,7 @@ import {
 import Sidebar from './Layout/Sidebar';
 import PhotosGallery from './Layout/PhotosGallery';
 // import MyMap from "./Layout/Map";
-import MyMap from './Layout/ModernMap';
+import MyMap from './Layout/Map1';
 import VariablesBlock from './VariablesBlock';
 
 import './index.css';

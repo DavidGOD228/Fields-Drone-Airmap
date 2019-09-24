@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component } from 'react';
 
 class MyMap extends Component {
   constructor(props) {
@@ -8,13 +8,38 @@ class MyMap extends Component {
   }
 
   componentDidMount() {
-    const googleMapScript = document.createElement("script");
-    googleMapScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI`;
+    const googleMapScript = document.createElement('script');
+    googleMapScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI&libraries=drawing`;
+    //const googleDrawMapScript = document.createElement('script');
+    // googleDrawMapScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI&libraries=drawing`;
     window.document.body.appendChild(googleMapScript);
-    googleMapScript.addEventListener("load", () => {
+    // window.document.body.appendChild(googleDrawMapScript);
+    googleMapScript.addEventListener('load', () => {
       this.googleMap = this.createGoogleMap();
       this.marker = this.createMarker();
     });
+
+    var drawingManager = new google.maps.drawing.DrawingManager({
+      drawingMode: google.maps.drawing.OverlayType.MARKER,
+      drawingControl: true,
+      drawingControlOptions: {
+        position: google.maps.ControlPosition.TOP_CENTER,
+        drawingModes: ['marker', 'circle', 'polygon', 'polyline', 'rectangle']
+      },
+      markerOptions: {
+        icon:
+          'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'
+      },
+      circleOptions: {
+        fillColor: '#ffff00',
+        fillOpacity: 1,
+        strokeWeight: 5,
+        clickable: false,
+        editable: true,
+        zIndex: 1
+      }
+    });
+    drawingManager.setMap(this.googleMap);
   }
 
   createGoogleMap() {
@@ -27,7 +52,7 @@ class MyMap extends Component {
       disableDefaultUI: true
     });
   }
-    
+
   createMarker() {
     return new window.google.maps.Marker({
       position: { lat: 43.642567, lng: -79.387054 },

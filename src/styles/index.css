@@ -26,10 +26,9 @@
 }
 
 .toggle-button {
-  /* display: block; */
   position: absolute;
   top: 49vh;
-  z-index: 20px;
+  z-index: 20;
   left: 94%;
   background: black;
   width: fit-content;
@@ -45,6 +44,10 @@
 
 .toggle-button svg {
   margin-left: 10px;
+}
+
+.toggle-button-activated {
+  left: 5px;
 }
 
 .photo-gallery-container {
@@ -142,3 +145,5 @@
 .menu-item {
   border-bottom: 1px solid white;
 }
+
+a[href^="http://maps.google.com/maps"], a[href^="https://maps.google.com/maps"], a[href^="https://www.google.com/maps"] { display: none !important; } .gm-bundled-control .gmnoprint { display: block; } .gmnoprint:not(.gm-bundled-control) { display: none; }

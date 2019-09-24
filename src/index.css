@@ -11390,10 +11390,9 @@ video {
 }
 
 .toggle-button {
-  /* display: block; */
   position: absolute;
   top: 49vh;
-  z-index: 20px;
+  z-index: 20;
   left: 94%;
   background: black;
   width: -webkit-fit-content;
@@ -11411,6 +11410,10 @@ video {
 
 .toggle-button svg {
   margin-left: 10px;
+}
+
+.toggle-button-activated {
+  left: 5px;
 }
 
 .photo-gallery-container {
@@ -11514,7 +11517,10 @@ video {
   border-bottom: 1px solid white;
 }
 
-@media (min-width: 640px) {
+a[href^="http://maps.google.com/maps"], a[href^="https://maps.google.com/maps"], a[href^="https://www.google.com/maps"] { display: none !important;
+} .gm-bundled-control .gmnoprint { display: block;
+} .gmnoprint:not(.gm-bundled-control) { display: none;
+} @media (min-width: 640px) {
   .sm\:sr-only {
     position: absolute;
     width: 1px;
@@ -22248,9 +22254,7 @@ video {
   .sm\:z-auto {
     z-index: auto;
   }
-}
-
-@media (min-width: 768px) {
+} @media (min-width: 768px) {
   .md\:sr-only {
     position: absolute;
     width: 1px;
@@ -32984,9 +32988,7 @@ video {
   .md\:z-auto {
     z-index: auto;
   }
-}
-
-@media (min-width: 1024px) {
+} @media (min-width: 1024px) {
   .lg\:sr-only {
     position: absolute;
     width: 1px;
@@ -43720,9 +43722,7 @@ video {
   .lg\:z-auto {
     z-index: auto;
   }
-}
-
-@media (min-width: 1280px) {
+} @media (min-width: 1280px) {
   .xl\:sr-only {
     position: absolute;
     width: 1px;

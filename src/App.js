@@ -10,7 +10,8 @@ import {
 
 import Sidebar from "./Layout/Sidebar";
 import PhotosGallery from "./Layout/PhotosGallery";
-import Maps from "./Layout/Map";
+// import MyMap from "./Layout/Map";
+import MyMap from "./Layout/Map1";
 import VariablesBlock from "./VariablesBlock";
 
 import "./index.css";
@@ -46,7 +47,7 @@ class App extends Component {
         <div className="min-h-screen md:flex">
           <div className={`flex flex-col content-around flex-none bg-gray-800 text-white relative ${ this.state.sidebarOn ? "w-full md:max-w-xs" : "w-0"}`}>
             <Sidebar>
-              <div className="toggle-button cursor-pointer" onClick={() => this.toggleSidebar(this)}>
+              <div className={`toggle-button cursor-pointer`} onClick={() => this.toggleSidebar(this)}>
                 <FontAwesomeIcon className="mr-2" icon={this.state.sidebarOn ? faChevronLeft : faChevronRight} />
               </div>
 
@@ -72,7 +73,7 @@ class App extends Component {
           <div className="flex-1 bg-gray-400 text-white">
             <Switch>
               <Route exact path="/" component={PhotosGallery} />
-              <Route exact path="/map" component={Maps} />
+              <Route exact path="/map" component={MyMap} />
             </Switch>
           </div>
         </div>

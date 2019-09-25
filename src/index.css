@@ -11517,10 +11517,27 @@ video {
   border-bottom: 1px solid white;
 }
 
-a[href^="http://maps.google.com/maps"], a[href^="https://maps.google.com/maps"], a[href^="https://www.google.com/maps"] { display: none !important;
-} .gm-bundled-control .gmnoprint { display: block;
-} .gmnoprint:not(.gm-bundled-control) { display: none;
-} @media (min-width: 640px) {
+#google-map {
+  height: 100vh;
+}
+
+/* a[href^="http://maps.google.com/maps"], a[href^="https://maps.google.com/maps"], a[href^="https://www.google.com/maps"] { display: none !important; } .gm-bundled-control .gmnoprint { display: block; } .gmnoprint:not(.gm-bundled-control) { display: none; } */
+
+#help-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: black;
+  z-index: 2;
+  opacity: 0.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 45px;
+  pointer-events: none;
+}
+
+@media (min-width: 640px) {
   .sm\:sr-only {
     position: absolute;
     width: 1px;
@@ -22254,7 +22271,9 @@ a[href^="http://maps.google.com/maps"], a[href^="https://maps.google.com/maps"],
   .sm\:z-auto {
     z-index: auto;
   }
-} @media (min-width: 768px) {
+}
+
+@media (min-width: 768px) {
   .md\:sr-only {
     position: absolute;
     width: 1px;
@@ -32988,7 +33007,9 @@ a[href^="http://maps.google.com/maps"], a[href^="https://maps.google.com/maps"],
   .md\:z-auto {
     z-index: auto;
   }
-} @media (min-width: 1024px) {
+}
+
+@media (min-width: 1024px) {
   .lg\:sr-only {
     position: absolute;
     width: 1px;
@@ -43722,7 +43743,9 @@ a[href^="http://maps.google.com/maps"], a[href^="https://maps.google.com/maps"],
   .lg\:z-auto {
     z-index: auto;
   }
-} @media (min-width: 1280px) {
+}
+
+@media (min-width: 1280px) {
   .xl\:sr-only {
     position: absolute;
     width: 1px;

@@ -11537,6 +11537,16 @@ video {
   pointer-events: none;
 }
 
+.start-flight-button {
+  display: block;
+  position: absolute;
+  z-index: 2;
+  left: calc(50% - 60px);
+  bottom: 40px;
+  width: 120px;
+  outline: none;
+}
+
 @media (min-width: 640px) {
   .sm\:sr-only {
     position: absolute;

@@ -50,7 +50,7 @@ class MyMap extends Component {
       });
       drawingManager.setMap(googleMap);
 
-      window.google.maps.event.addListener(drawingManager, 'polygoncomplete', function(polygon) {
+      window.google.maps.event.addListener(drawingManager, 'polygoncomplete', (polygon) => {
         const polyArr = []
         for (var i = 0; i < polygon.getPath().getLength(); i++) {
           polyArr.push({
@@ -59,7 +59,8 @@ class MyMap extends Component {
           });
         }
       });
-      window.google.maps.event.addListener(drawingManager, 'markercomplete', function(marker) {
+
+      window.google.maps.event.addListener(drawingManager, 'markercomplete', (marker) => {
         const pos = {
           lat: marker.getPosition().lat(),
           lng: marker.getPosition().lng()

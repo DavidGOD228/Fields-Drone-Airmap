@@ -82,7 +82,8 @@ class MyMap extends Component {
     // });
 
 
-    // https://maps.googleapis.com/maps/api/staticmap?size=400x400&center=44.714728,-73.998672&zoom=18&maptype=satellite&key=AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI
+
+    // https://maps.googleapis.com/maps/api/staticmap?size=400x400&center=51.359313,25.499893&zoom=18&maptype=satellite&key=AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI
     let photos  = this.makePhotos([
       { lat: 43.642567, lng: -79.387054 },
       { lat: 43.642567, lng: -49.387054 },

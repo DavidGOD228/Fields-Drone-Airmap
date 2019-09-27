@@ -1,4 +1,7 @@
 import React, { Component } from "react";
+import Rectangle from "../calculations/Rectangle.js"
+// TODO: make photos of the field
+// https://maps.googleapis.com/maps/api/staticmap?size=400x400&center=51.359313,25.499893&zoom=18&maptype=satellite&key=AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI
 
 class MyMap extends Component {
   constructor(props) {
@@ -125,7 +128,7 @@ class MyMap extends Component {
       drawingMode: window.google.maps.drawing.OverlayType.MARKER,
       drawingControlOptions: {
         position: window.google.maps.ControlPosition.TOP_CENTER,
-        drawingModes: ['marker', 'polygon']
+        drawingModes: ['marker', 'polygon', 'rectangle']
       },
       
       polygonOptions: polyOptions,
@@ -168,6 +171,54 @@ class MyMap extends Component {
       // this.stopDrawing();
     });
 
+    window.google.maps.event.addListener(drawingManager, 'rectanglecomplete', (rect) => {
+      let { bounds }  = rect;
+
+      let tr = {
+        lat: bounds.getNorthEast().lat(),
+        lng: bounds.getNorthEast().lng()
+      }, bl = {
+        lat: bounds.getSouthWest().lat(),
+        lng: bounds.getSouthWest().lng()
+      }
+
+      let myRect = new Rectangle(tr, bl);
+      // console.log('southWest, northEast :', southWest, northEast);
+    
+      // let d = new window.google.maps.Marker({
+      //   position: myRect.tr,
+      //   map: this.state.map,
+      // })
+      // let d1 = new window.google.maps.Marker({
+      //   position: myRect.tl,
+      //   map: this.state.map,
+      // })
+      // let d2 = new window.google.maps.Marker({
+      //   position: myRect.bl,
+      //   map: this.state.map,
+      // })
+      // let d3 = new window.google.maps.Marker({
+      //   position: myRect.br,
+      //   map: this.state.map,
+      // })
+
+      this.setState({
+        field: myRect
+      })
+
+      if(!this.state.labels[this.state.currentLabelIdx + 1]) { 
+        this.stopDrawing();
+        this.setState({
+          readyForStart: true
+        })
+      }
+      this.setState(state => {
+        return {
+          currentLabelIdx: state.currentLabelIdx + 1,
+        }
+      })
+    });
+
     window.google.maps.event.addListener(drawingManager, 'markercomplete', (marker) => {
       const pos = {
         lat: marker.getPosition().lat(),
@@ -191,9 +242,13 @@ class MyMap extends Component {
         }
       })
 
-      this.state.drawingManager.setDrawingMode(window.google.maps.drawing.OverlayType.POLYGON);
+      this.state.drawingManager.setDrawingMode(window.google.maps.drawing.OverlayType.RECTANGLE);
 
       this.createDrone({
+        // position: {
+        //   lat: pos.lat - 0.0005,
+        //   lng: pos.lng
+        // },
         position: pos,
         map: this.state.map,
         icon: {
@@ -290,7 +345,11 @@ class MyMap extends Component {
     //   // infowindows[marker.place_id].open(map,marker);
     // });
   
-   }
+  }
+
+  testSetup() {
+    
+  }
 
   render() {
     const { labels, currentLabelIdx, readyForStart } = this.state;
@@ -321,3 +380,4 @@ class MyMap extends Component {
   }
 }
 export default MyMap;
+

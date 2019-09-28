@@ -1,5 +1,7 @@
-import React, { Component } from "react";
-import Rectangle from "../calculations/Rectangle.js"
+import React, { Component } from 'react';
+import Rectangle from '../calculations/Rectangle.js';
+import { Drone } from '../calculations/drone.js';
+import { SIGTSTP } from 'constants';
 // TODO: make photos of the field
 // https://maps.googleapis.com/maps/api/staticmap?size=400x400&center=51.359313,25.499893&zoom=18&maptype=satellite&key=AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI
 
@@ -11,18 +13,16 @@ class MyMap extends Component {
 
       base: null,
       field: null,
+      drone: null,
       readyForStart: false,
 
       currentLabelIdx: 0,
-      labels: [
-        "Set the base",
-        "Set the field"
-      ],
-      
+      labels: ['Set the base', 'Set the field'],
+
       map: null,
       drawingManager: null,
       selectedShape: null,
-      colors: ["#1E90FF", "#FF1493", "#32CD32", "#FF8C00", "#4B0082"],
+      colors: ['#1E90FF', '#FF1493', '#32CD32', '#FF8C00', '#4B0082'],
       selectedColor: null,
       colorButtons: {}
     };
@@ -30,37 +30,37 @@ class MyMap extends Component {
   }
 
   componentDidMount() {
-    const googleMapScript = document.createElement("script");
+    const googleMapScript = document.createElement('script');
     googleMapScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI&libraries=drawing`;
     window.document.body.appendChild(googleMapScript);
 
-    googleMapScript.addEventListener("load", () => {
+    googleMapScript.addEventListener('load', () => {
       this.initialize();
     });
   }
 
   clearSelection() {
     if (this.state.selectedShape) {
-      if (this.state.selectedShape.type !== "marker") {
-        this.state.selectedShape.setEditable(false)
+      if (this.state.selectedShape.type !== 'marker') {
+        this.state.selectedShape.setEditable(false);
       }
       this.setState({
         selectedShape: null
-      })
+      });
     }
   }
 
   setSelection(shape) {
-    if (shape.type !== "marker") {
+    if (shape.type !== 'marker') {
       this.clearSelection.call(this);
 
       shape.setEditable(true);
-      this.selectColor(shape.get("fillColor") || shape.get("strokeColor"));
+      this.selectColor(shape.get('fillColor') || shape.get('strokeColor'));
     }
 
     this.setState({
       selectedShape: shape
-    })
+    });
   }
 
   deleteSelectedShape() {
@@ -74,28 +74,29 @@ class MyMap extends Component {
       selectedColor: color
     });
 
-    let polygonOptions = this.state.drawingManager.get("polygonOptions");
+    let polygonOptions = this.state.drawingManager.get('polygonOptions');
     polygonOptions.fillColor = color;
-    this.state.drawingManager.set("polygonOptions", polygonOptions);
+    this.state.drawingManager.set('polygonOptions', polygonOptions);
   }
 
   setSelectedShapeColor(color) {
     if (this.state.selectedShape) {
       if (
-        this.state.selectedShape.type == window.google.maps.drawing.OverlayType.POLYLINE
+        this.state.selectedShape.type ==
+        window.google.maps.drawing.OverlayType.POLYLINE
       ) {
-        this.state.selectedShape.set("strokeColor", color);
+        this.state.selectedShape.set('strokeColor', color);
       } else {
-        this.state.selectedShape.set("fillColor", color);
+        this.state.selectedShape.set('fillColor', color);
       }
     }
   }
 
   makeColorButton(color) {
-    var button = document.createElement("span");
-    button.className = "color-button";
+    var button = document.createElement('span');
+    button.className = 'color-button';
     button.style.backgroundColor = color;
-    window.google.maps.event.addDomListener(button, "click", function() {
+    window.google.maps.event.addDomListener(button, 'click', function() {
       this.selectColor(color);
       this.setSelectedShapeColor(color);
     });
@@ -112,7 +113,7 @@ class MyMap extends Component {
       },
       mapTypeId: window.google.maps.MapTypeId.SATELLITE,
       disableDefaultUI: true,
-        zoomControl: true
+      zoomControl: true
     });
 
     var polyOptions = {
@@ -130,7 +131,7 @@ class MyMap extends Component {
         position: window.google.maps.ControlPosition.TOP_CENTER,
         drawingModes: ['marker', 'polygon', 'rectangle']
       },
-      
+
       polygonOptions: polyOptions,
       markerOptions: {
         draggable: true,
@@ -140,126 +141,148 @@ class MyMap extends Component {
     });
     drawingManager.setMap(map);
 
-    window.google.maps.event.addListener(drawingManager, 'polygoncomplete', (polygon) => {
-      const polyArr = []
-      for (var i = 0; i < polygon.getPath().getLength(); i++) {
-        polyArr.push({
-          lat: polygon.getPath().getAt(i).lat(),
-          lng: polygon.getPath().getAt(i).lng()  
+    window.google.maps.event.addListener(
+      drawingManager,
+      'polygoncomplete',
+      polygon => {
+        const polyArr = [];
+        for (var i = 0; i < polygon.getPath().getLength(); i++) {
+          polyArr.push({
+            lat: polygon
+              .getPath()
+              .getAt(i)
+              .lat(),
+            lng: polygon
+              .getPath()
+              .getAt(i)
+              .lng()
+          });
+        }
+        console.log('polyArr :', polyArr);
+        // FIXME: not customizable at all
+
+        this.setState({
+          field: polyArr
+        });
+
+        if (!this.state.labels[this.state.currentLabelIdx + 1]) {
+          this.stopDrawing();
+          this.setState({
+            readyForStart: true
+          });
+        }
+        this.setState(state => {
+          return {
+            currentLabelIdx: state.currentLabelIdx + 1
+          };
+        });
+
+        // this.stopDrawing();
+      }
+    );
+
+    window.google.maps.event.addListener(
+      drawingManager,
+      'rectanglecomplete',
+      rect => {
+        let { bounds } = rect;
+
+        let tr = {
+            lat: bounds.getNorthEast().lat(),
+            lng: bounds.getNorthEast().lng()
+          },
+          bl = {
+            lat: bounds.getSouthWest().lat(),
+            lng: bounds.getSouthWest().lng()
+          };
+
+        let myRect = new Rectangle(tr, bl);
+        // console.log('southWest, northEast :', southWest, northEast);
+
+        // let d = new window.google.maps.Marker({
+        //   position: myRect.tr,
+        //   map: this.state.map,
+        // })
+        // let d1 = new window.google.maps.Marker({
+        //   position: myRect.tl,
+        //   map: this.state.map,
+        // })
+        // let d2 = new window.google.maps.Marker({
+        //   position: myRect.bl,
+        //   map: this.state.map,
+        // })
+        // let d3 = new window.google.maps.Marker({
+        //   position: myRect.br,
+        //   map: this.state.map,
+        // })
+
+        this.setState({
+          field: myRect
+        });
+
+        if (!this.state.labels[this.state.currentLabelIdx + 1]) {
+          this.stopDrawing();
+          this.setState({
+            readyForStart: true
+          });
+        }
+        this.setState(state => {
+          return {
+            currentLabelIdx: state.currentLabelIdx + 1
+          };
         });
       }
-      console.log('polyArr :', polyArr);
-      // FIXME: not customizable at all 
+    );
 
+    window.google.maps.event.addListener(
+      drawingManager,
+      'markercomplete',
+      marker => {
+        const pos = {
+          lat: marker.getPosition().lat(),
+          lng: marker.getPosition().lng()
+        };
+        console.log('homeMarker.getPosition():', pos);
 
-      this.setState({
-        field: polyArr
-      })
-
-      if(!this.state.labels[this.state.currentLabelIdx + 1]) { 
-        this.stopDrawing();
         this.setState({
-          readyForStart: true
-        })
-      }
-      this.setState(state => {
-        return {
-          currentLabelIdx: state.currentLabelIdx + 1,
+          base: pos
+        });
+
+        if (!this.state.labels[this.state.currentLabelIdx + 1]) {
+          this.stopDrawing();
+          this.setState({
+            readyForStart: true
+          });
         }
-      })
+        this.setState(state => {
+          return {
+            currentLabelIdx: state.currentLabelIdx + 1
+          };
+        });
 
-      // this.stopDrawing();
-    });
+        this.state.drawingManager.setDrawingMode(
+          window.google.maps.drawing.OverlayType.RECTANGLE
+        );
 
-    window.google.maps.event.addListener(drawingManager, 'rectanglecomplete', (rect) => {
-      let { bounds }  = rect;
+        this.state.drone = new Drone(
+          {
+            // position: {
+            //   lat: pos.lat - 0.0005,
+            //   lng: pos.lng
+            // },
+            position: pos,
+            map: this.state.map,
+            icon: {
+              url: 'https://image.flaticon.com/icons/svg/215/215736.svg',
+              scaledSize: new window.google.maps.Size(32, 32)
+            }
+          },
+          window
+        );
 
-      let tr = {
-        lat: bounds.getNorthEast().lat(),
-        lng: bounds.getNorthEast().lng()
-      }, bl = {
-        lat: bounds.getSouthWest().lat(),
-        lng: bounds.getSouthWest().lng()
+        // FIXME: not customizable at all
       }
-
-      let myRect = new Rectangle(tr, bl);
-      // console.log('southWest, northEast :', southWest, northEast);
-    
-      // let d = new window.google.maps.Marker({
-      //   position: myRect.tr,
-      //   map: this.state.map,
-      // })
-      // let d1 = new window.google.maps.Marker({
-      //   position: myRect.tl,
-      //   map: this.state.map,
-      // })
-      // let d2 = new window.google.maps.Marker({
-      //   position: myRect.bl,
-      //   map: this.state.map,
-      // })
-      // let d3 = new window.google.maps.Marker({
-      //   position: myRect.br,
-      //   map: this.state.map,
-      // })
-
-      this.setState({
-        field: myRect
-      })
-
-      if(!this.state.labels[this.state.currentLabelIdx + 1]) { 
-        this.stopDrawing();
-        this.setState({
-          readyForStart: true
-        })
-      }
-      this.setState(state => {
-        return {
-          currentLabelIdx: state.currentLabelIdx + 1,
-        }
-      })
-    });
-
-    window.google.maps.event.addListener(drawingManager, 'markercomplete', (marker) => {
-      const pos = {
-        lat: marker.getPosition().lat(),
-        lng: marker.getPosition().lng()
-      }
-      console.log('homeMarker.getPosition():', pos);
-
-      this.setState({
-        base: pos
-      })
-    
-      if(!this.state.labels[this.state.currentLabelIdx + 1]) { 
-        this.stopDrawing();
-        this.setState({
-          readyForStart: true
-        })
-      }
-      this.setState(state => {
-        return {
-          currentLabelIdx: state.currentLabelIdx + 1
-        }
-      })
-
-      this.state.drawingManager.setDrawingMode(window.google.maps.drawing.OverlayType.RECTANGLE);
-
-      this.createDrone({
-        // position: {
-        //   lat: pos.lat - 0.0005,
-        //   lng: pos.lng
-        // },
-        position: pos,
-        map: this.state.map,
-        icon: {
-          url: "https://image.flaticon.com/icons/svg/215/215736.svg",
-          scaledSize: new window.google.maps.Size(32, 32)
-        }
-      })
-    
-
-      // FIXME: not customizable at all 
-    });
+    );
 
     // TODO: Delete map element
     // window.google.maps.event.addListener(drawingManager, 'overlaycomplete', (event) => {
@@ -271,15 +294,14 @@ class MyMap extends Component {
 
     window.google.maps.event.addListener(
       drawingManager,
-      "overlaycomplete",
-      (e) => {
+      'overlaycomplete',
+      e => {
         var newShape = e.overlay;
-
         newShape.type = e.type;
 
         if (e.type !== window.google.maps.drawing.OverlayType.MARKER) {
           drawingManager.setDrawingMode(null);
-          window.google.maps.event.addListener(newShape, "click", function(e) {
+          window.google.maps.event.addListener(newShape, 'click', function(e) {
             if (e.vertex !== undefined) {
               if (
                 newShape.type === window.google.maps.drawing.OverlayType.POLYGON
@@ -295,7 +317,7 @@ class MyMap extends Component {
           });
           this.setSelection(newShape);
         } else {
-          window.google.maps.event.addListener(newShape, "click", function(e) {
+          window.google.maps.event.addListener(newShape, 'click', function(e) {
             this.setSelection(newShape);
           });
           this.setSelection(newShape);
@@ -305,16 +327,18 @@ class MyMap extends Component {
 
     window.google.maps.event.addListener(
       drawingManager,
-      "drawingmode_changed",
+      'drawingmode_changed',
       () => this.clearSelection.call(that)
     );
 
-    window.google.maps.event.addListener(map, "click", () => this.clearSelection.call(that));
+    window.google.maps.event.addListener(map, 'click', () =>
+      this.clearSelection.call(that)
+    );
 
     this.setState({
       drawingManager: drawingManager,
       map: map
-    })
+    });
   }
 
   stopDrawing() {
@@ -331,41 +355,29 @@ class MyMap extends Component {
     // }
   }
 
-  createDrone(options, place) {
-    let marker = new window.google.maps.Marker(options);
-    // marker.place_id = place.id;
-    // markers[place.id] = marker;
-    // let infowindow = new window.google.maps.InfoWindow({
-    //   content: place.details
-    // });
-  
-    // infowindows[place.id] = infowindow;
-  
-    // window.google.maps.event.addListener(marker, 'click', function() {
-    //   // infowindows[marker.place_id].open(map,marker);
-    // });
-  
+  handleButtonClick() {
+    this.state.drone.goToTopLeft(this.state.field);
   }
 
-  testSetup() {
-    
-  }
+  testSetup() {}
 
   render() {
     const { labels, currentLabelIdx, readyForStart } = this.state;
     console.log('readyForStart :', readyForStart);
+    let that = this;
     return (
       <div className="relative">
-        <div 
-          id="help-container" 
-          style={{display: labels[currentLabelIdx] ? 'flex' : 'none' }}
+        <div
+          id="help-container"
+          style={{ display: labels[currentLabelIdx] ? 'flex' : 'none' }}
         >
           {labels[currentLabelIdx]}
         </div>
 
-        <button 
+        <button
+          onClick={() => this.handleButtonClick.call(that)}
           className="start-flight-button click-scale-down bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
-          style={{display: readyForStart ? "block" : "none" }}
+          style={{ display: readyForStart ? 'block' : 'none' }}
         >
           Start
         </button>
@@ -380,4 +392,3 @@ class MyMap extends Component {
   }
 }
 export default MyMap;
-

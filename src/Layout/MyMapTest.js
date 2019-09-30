@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import Rectangle from '../calculations/Rectangle.js';
-import { Drone } from '../calculations/drone.js';
+import Drone from '../calculations/Drone.js';
+import Vector from "../calculations/Vector";
 import { SIGTSTP } from 'constants';
+
+// console.log('Drone :', Rectangle);
 // TODO: make photos of the field
 // https://maps.googleapis.com/maps/api/staticmap?size=400x400&center=51.359313,25.499893&zoom=18&maptype=satellite&key=AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI
 
@@ -158,7 +161,6 @@ class MyMap extends Component {
               .lng()
           });
         }
-        console.log('polyArr :', polyArr);
         // FIXME: not customizable at all
 
         this.setState({
@@ -242,7 +244,6 @@ class MyMap extends Component {
           lat: marker.getPosition().lat(),
           lng: marker.getPosition().lng()
         };
-        console.log('homeMarker.getPosition():', pos);
 
         this.setState({
           base: pos
@@ -266,11 +267,12 @@ class MyMap extends Component {
 
         this.state.drone = new Drone(
           {
-            // position: {
-            //   lat: pos.lat - 0.0005,
-            //   lng: pos.lng
-            // },
             position: pos,
+            speed: 0.000004,
+            overlayRadiusLat: 0.0001,
+            overlayRadiusLng: 0.0002,
+            direction: Math.PI / 2,
+            targetMode: true,
             map: this.state.map,
             icon: {
               url: 'https://image.flaticon.com/icons/svg/215/215736.svg',
@@ -355,15 +357,31 @@ class MyMap extends Component {
     // }
   }
 
-  handleButtonClick() {
-    this.state.drone.goToTopLeft(this.state.field);
+  startFlight() {
+    let that = this;
+    this.state.drone.setField(this.state.field);
+    // let target = this.state.drone.findClosestPoint(this.state.field.toArray());
+    // console.log('target.add(this.state.drone.overlayRadiusLat, this.state.drone.overlayRadiusLng) :', target.add(new Vector(this.state.drone.overlayRadiusLat, this.state.drone.overlayRadiusLng)));
+    // this.state.drone.addToPath(target.add(new Vector(this.state.drone.overlayRadiusLat, this.state.drone.overlayRadiusLng)));
+    // this.state.drone.addToPath(this.state.drone.mapToCenter(target));
+    this.update.call(that);
+    console.log('this.state.drone :', this.state.drone);
+  }
+
+  update() {
+    this.state.drone.update();
+    if(!this.state.drone.finishedFlight) {
+      setTimeout(() => {
+        this.update.call(this)
+      }, 1);
+    }
+    // requestAnimationFrame(this.update.call(this));
   }
 
   testSetup() {}
 
   render() {
     const { labels, currentLabelIdx, readyForStart } = this.state;
-    console.log('readyForStart :', readyForStart);
     let that = this;
     return (
       <div className="relative">
@@ -375,7 +393,7 @@ class MyMap extends Component {
         </div>
 
         <button
-          onClick={() => this.handleButtonClick.call(that)}
+          onClick={() => this.startFlight.call(that)}
           className="start-flight-button click-scale-down bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
           style={{ display: readyForStart ? 'block' : 'none' }}
         >

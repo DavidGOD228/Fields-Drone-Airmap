@@ -10,6 +10,10 @@ class Rectangle {
       lng: this.bl.lng
     }
   }
+
+  toArray() {
+    return [this.tr, this.tl, this.br, this.bl]
+  }
 }
 
 export default Rectangle;

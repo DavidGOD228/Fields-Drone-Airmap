@@ -1,84 +1,89 @@
-var Vector = {
-  _x: 1,
-  _y: 0,
-
-  create: function (x, y) {
-    let obj = Object.create(this);
-    obj.setX(x);
-    obj.setY(y);
-    return obj;
-  },
-
-  setX: function (value) {
+class Vector { 
+  constructor(x, y) {
+    this.setX(x);
+    this.setY(y);
+  }
+  
+  setX (value) {
     this._x = value;
-  },
+  }
 
-  setY: function (value) {
+  setY (value) {
     this._y =  value;
-  },
+  }
 
-  getX: function () {
+  getX () {
     return this._x
-  },
+  }
 
-  getY: function () {
+  getY () {
     return this._y
-  },
+  }
 
-  getLength: function () {
+  getLength () {
     return Math.sqrt(this._x * this._x + this._y * this._y);
-  },
+  }
 
-  setLength: function (length) {
+  setLength (length) {
     let angle = this.getAngle();
     this._x = length * Math.cos(angle);
     this._y = length * Math.sin(angle);
-  },
+  }
 
-  getAngle: function () {
+  getAngle () {
     return Math.atan2(this._y, this._x);
-  },
+  }
 
-  setAngle: function (angle) {
+  distanceTo(v) {
+    // console.log('v :', v);
+    // console.log('this :', this);
+    // let newv = new Vector(v._x - this._x, v._y - this._y)
+    // let d= newv.getLength();
+    // console.log('newv, d :', newv, d);
+    // return new Vector(v._x - this._x, v._y - this._y).getLength();
+    return new Vector(v._x - this._x, v._y - this._y).getLength();
+  }
+
+  setAngle (angle) {
     let length = this.getLength();
     this._x = length * Math.cos(angle);
     this._y = length * Math.sin(angle);
-  },
+  }
 
-  add: function (v2) {
-    return vector.create(v2._x + this._x, v2._y + this._y);
-  },
+  add (v2) {
+    return new Vector(v2._x + this._x, v2._y + this._y);
+  }
 
-  subtract: function (v2) {
-    return vector.create(v2._x - this._x, v2._y - this._y);
-  },
+  subtract (v2) {
+    return new Vector(v2._x - this._x, v2._y - this._y);
+  }
 
-  multiply: function (val) {
-    return vector.create(this._x * val, this._y * val);
-  },
+  multiply (val) {
+    return new Vector(this._x * val, this._y * val);
+  }
 
-  divide: function (val) {
-    return vector.create(this._x / val, this._y / val);
-  },
+  divide (val) {
+    return new Vector(this._x / val, this._y / val);
+  }
 
-  addTo: function (v2) {
+  addTo (v2) {
     this._x += v2._x;
     this._y += v2._y;
-  },
+  }
 
-  subtractFrom: function (v2) {
+  subtractFrom (v2) {
     this._x -= v2._x;
     this._y -= v2._y;
-  },
+  }
 
-  multiplyBy: function (val) {
+  multiplyBy (val) {
     this._x *= val;
     this._y *= val;
-  },
+  }
 
-  divideBy: function (val) {
+  divideBy (val) {
     this._x /= val;
     this._y /= val;
-  },
-
+  }
 }
+export default Vector;

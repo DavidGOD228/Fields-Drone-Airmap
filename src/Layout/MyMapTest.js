@@ -360,10 +360,10 @@ class MyMap extends Component {
   startFlight() {
     let that = this;
     this.state.drone.setField(this.state.field);
-    // let target = this.state.drone.findClosestPoint(this.state.field.toArray());
+    let target = this.state.drone.findClosestPoint(this.state.field.toArray());
     // console.log('target.add(this.state.drone.overlayRadiusLat, this.state.drone.overlayRadiusLng) :', target.add(new Vector(this.state.drone.overlayRadiusLat, this.state.drone.overlayRadiusLng)));
     // this.state.drone.addToPath(target.add(new Vector(this.state.drone.overlayRadiusLat, this.state.drone.overlayRadiusLng)));
-    // this.state.drone.addToPath(this.state.drone.mapToCenter(target));
+    this.state.drone.addToPath(this.state.drone.mapToCenter(target));
     this.update.call(that);
     console.log('this.state.drone :', this.state.drone);
   }

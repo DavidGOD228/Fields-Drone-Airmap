@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Rectangle from '../calculations/Rectangle.js';
 import Drone from '../calculations/Drone.js';
 import Vector from "../calculations/Vector";
+import Field from "../calculations/Field";
 import { SIGTSTP } from 'constants';
 
 // TODO: make photos of the field
@@ -197,28 +198,16 @@ class MyMap extends Component {
             lng: bounds.getSouthWest().lng()
           };
 
-        let myRect = new Rectangle(tr, bl);
-        // console.log('southWest, northEast :', southWest, northEast);
-
-        // let d = new window.google.maps.Marker({
-        //   position: myRect.tr,
-        //   map: this.state.map,
-        // })
-        // let d1 = new window.google.maps.Marker({
-        //   position: myRect.tl,
-        //   map: this.state.map,
-        // })
-        // let d2 = new window.google.maps.Marker({
-        //   position: myRect.bl,
-        //   map: this.state.map,
-        // })
-        // let d3 = new window.google.maps.Marker({
-        //   position: myRect.br,
-        //   map: this.state.map,
-        // })
+        // let myRect = new Rectangle(tr, bl);
+        let field = new Field({
+          bounds: {
+            tr, bl
+          }
+        })
+        
 
         this.setState({
-          field: myRect
+          field
         });
 
         if (!this.state.labels[this.state.currentLabelIdx + 1]) {
@@ -268,7 +257,7 @@ class MyMap extends Component {
           {
             position: pos,
             speed: 0.000004,
-            overlayRadiusLat: 0.0001,
+            overlayRadiusLat: 0.0002,
             overlayRadiusLng: 0.0002,
             direction: Math.PI / 2,
             targetMode: true,
@@ -359,9 +348,13 @@ class MyMap extends Component {
   startFlight() {
     let that = this;
     this.state.drone.setField(this.state.field);
-    let target = this.state.drone.findClosestPoint(this.state.field.toArray());
+    let target = this.state.drone.findClosestPoint(this.state.field.bounds.toArray());
     // console.log('target.add(this.state.drone.overlayRadiusLat, this.state.drone.overlayRadiusLng) :', target.add(new Vector(this.state.drone.overlayRadiusLat, this.state.drone.overlayRadiusLng)));
     // this.state.drone.addToPath(target.add(new Vector(this.state.drone.overlayRadiusLat, this.state.drone.overlayRadiusLng)));
+
+    this.state.field.setSquareRadius(this.state.drone.overlayRadiusLng);
+    this.state.field.distributeOnSquares();
+
     this.state.drone.addToPath(this.state.drone.mapToCenter(target));
     this.update.call(that);
     console.log('this.state.drone :', this.state.drone);

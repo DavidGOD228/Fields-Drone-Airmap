@@ -28,8 +28,8 @@ class Drone {
       fillOpacity: 0.35,
       map: this.map,
       bounds: {
-        north: this.position.lat + this.overlayRadiusLat,
-        south: this.position.lat - this.overlayRadiusLat,
+        north: this.position.lat + this.overlayRadiusLng,
+        south: this.position.lat - this.overlayRadiusLng,
         east:  this.position.lng + this.overlayRadiusLng,
         west:  this.position.lng - this.overlayRadiusLng
       }

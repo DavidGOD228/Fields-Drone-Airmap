@@ -16,3 +16,13 @@ export const vectorMapProxy = (v) => {
   Object.defineProperty(v, 'lng', { get: function() { return this.getY(); } });
   return v;
 }
+
+// export const create2dimentionalArray = (r, c) => {
+//   let arr = new Array(r);
+
+//   for (var i = 0; i < x.length; i++) {
+//     x[i] = new Array(c);
+//   }
+
+//   console.log(x);
+// }

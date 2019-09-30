@@ -4,7 +4,6 @@ import Drone from '../calculations/Drone.js';
 import Vector from "../calculations/Vector";
 import { SIGTSTP } from 'constants';
 
-// console.log('Drone :', Rectangle);
 // TODO: make photos of the field
 // https://maps.googleapis.com/maps/api/staticmap?size=400x400&center=51.359313,25.499893&zoom=18&maptype=satellite&key=AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI
 

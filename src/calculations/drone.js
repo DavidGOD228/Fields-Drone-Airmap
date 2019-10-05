@@ -1,5 +1,6 @@
 import Vector from './Vector';
 import { mapToVector, vectorToMap, vectorMapProxy } from './helpers';
+import { MainCalculation } from '../calculations/flyCalculations';
 
 class Drone {
   constructor(options, window) {

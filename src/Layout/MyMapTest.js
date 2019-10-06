@@ -3,6 +3,7 @@ import Rectangle from '../calculations/Rectangle.js';
 import Drone from '../calculations/drone.js';
 import Vector from '../calculations/Vector';
 import Field from '../calculations/Field';
+import { MainCalculation } from '../calculations/flyCalculations';
 
 import { SIGTSTP } from 'constants';
 
@@ -272,6 +273,15 @@ class MyMap extends Component {
                 360 /
                 (40000 / 360)), //
             direction: Math.PI / 2,
+
+            maxHeight: 0.01,
+            focusDistance: 0.001,
+            sensorA: 0.001,
+            sensorB: 0.002,
+            charge: 1000,
+            flightCosts: 0,
+            photoCosts: 0,
+
             targetMode: true,
             map: this.state.map,
             icon: {
@@ -360,16 +370,29 @@ class MyMap extends Component {
   startFlight() {
     let that = this;
     this.state.drone.setField(this.state.field);
+    this.state.drone.setBase(this.state.base);
     let target = this.state.drone.findClosestPoint(
       this.state.field.bounds.toArray()
     );
-    // console.log('target.add(this.state.drone.overlayRadiusLat, this.state.drone.overlayRadiusLng) :', target.add(new Vector(this.state.drone.overlayRadiusLat, this.state.drone.overlayRadiusLng)));
-    // this.state.drone.addToPath(target.add(new Vector(this.state.drone.overlayRadiusLat, this.state.drone.overlayRadiusLng)));
+
+    
 
     this.state.field.setSquareRadius(this.state.drone.overlayRadiusLng);
     this.state.field.distributeOnSquares();
 
-    this.state.drone.addToPath(this.state.drone.mapToCenter(target));
+    let { field, drone, base } = this.state;
+    let data = JSON.parse(MainCalculation({base, field, drone}));
+    console.log('points :', data.PointsArr);
+    for(let p of data.PointsArr) {
+      let vp = new Vector(p.x, p.y);
+      this.state.drone.addToPath(this.state.drone.mapToCenter(vp));
+    }
+
+    // this.state.drone.addToPath(this.state.drone.mapToCenter(target));
+    // for(let i = 0; i < data.)
+    // this.state.drone.addToPath(this.state.drone.mapToCenter(target));
+    
+
     this.update.call(that);
     console.log('this.state.drone :', this.state.drone);
   }

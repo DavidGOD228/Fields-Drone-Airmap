@@ -4,7 +4,7 @@ class Point {
   constructor(xc, yc, zc) {
     this.x = xc;
     this.y = yc;
-    this.z = zc;
+    this.z = zc || 0;
   }
 
   Add(that) {
@@ -205,7 +205,8 @@ class Heli {
       (this.realCoords.z * this.sensorB) / this.focus_distance,
       (this.realCoords.z * this.sensorA) / this.focus_distance
     );
-    Math.swap(this.sensorA, this.sensorB);
+    [this.sensorA, this.sensorB] = [this.sensorB, this.sensorA]
+    // Math.swap(this.sensorA, this.sensorB);
   }
 
   startPos(field) {
@@ -751,42 +752,47 @@ function Logic(heli, field) {
   return json;
 }
 
-function MainCalculation(
-  baseX,
-  baseY,
-  BaseZ,
-  FieldAx,
-  FieldAy,
-  FieldBx,
-  FieldBy,
-  FieldCx,
-  FieldCy,
-  FieldDx,
-  FieldDy,
-  maxHeight,
-  focus_distance,
-  sensorA,
-  sensorB,
-  charge,
-  flightCosts,
-  photoCosts
-) {
-  var FieldA = new Point(FieldAx, FieldAy);
-  var FieldB = new Point(FieldBx, FieldBy);
-  var FieldC = new Point(FieldCx, FieldCy);
-  var FieldD = new Point(FieldDx, FieldDy);
+// baseX,
+  // baseY,
+  // BaseZ,
+  // FieldAx,
+  // FieldAy,
+  // FieldBx,
+  // FieldBy,
+  // FieldCx,
+  // FieldCy,
+  // FieldDx,
+  // FieldDy,
+  // maxHeight,
+  // focusDistance,
+  // sensorA,
+  // sensorB,
+  // charge,
+  // flightCosts,
+  // photoCosts
 
-  var field = new FieldCoords(FieldA, FieldB, FieldC, FieldD);
-  var base = new BaseCoords(Point(baseX, baseY, BaseZ));
+function MainCalculation({
+  field, base, drone
+}) {
+  // this.tr, this.tl, this.br, this.bl
+  var bl = new Point(field.bounds.bl.lat, field.bounds.bl.lng);
+  var tl = new Point(field.bounds.tl.lat, field.bounds.tl.lng);
+  var tr = new Point(field.bounds.tr.lat, field.bounds.tr.lng);
+  var br = new Point(field.bounds.br.lat, field.bounds.br.lng);
+
+  var field = new FieldCoords(bl, tl, tr, br);
+  var base = new BaseCoords(new Point(base.lat, base.lng, 1));
+
   var heli = new Heli(
-    maxHeight,
-    focus_distance,
-    sensorA,
-    sensorB,
-    charge,
-    flightCosts,
-    photoCosts,
+    drone.maxHeight,
+    drone.focusDistance,
+    drone.sensorA,
+    drone.sensorB,
+    drone.charge,
+    drone.flightCosts,
+    drone.photoCosts,
     base
-  );
+    );
+  // console.log('base, field, heli :', base, field, heli);
   return Logic(heli, field);
 }

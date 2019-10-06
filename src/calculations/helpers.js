@@ -23,6 +23,4 @@ export const vectorMapProxy = (v) => {
 //   for (var i = 0; i < x.length; i++) {
 //     x[i] = new Array(c);
 //   }
-
-//   console.log(x);
 // }

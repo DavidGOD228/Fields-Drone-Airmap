@@ -20,7 +20,6 @@ class MyMap extends Component {
 
   componentDidMount() {
     const googleMapScript = document.createElement('script');
-    console.log("AIzaSyDWANjp4pZTM0TSK2Ic43JvHiK1yg_b_ec");
     googleMapScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI&libraries=drawing`;
     //const googleDrawMapScript = document.createElement('script');
     // googleDrawMapScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI&libraries=drawing`;

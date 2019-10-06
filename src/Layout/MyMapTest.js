@@ -4,6 +4,7 @@ import Drone from '../calculations/drone.js';
 import Vector from '../calculations/Vector';
 import Field from '../calculations/Field';
 import { MainCalculation } from '../calculations/flyCalculations';
+import { mapToVector } from "../calculations/helpers"
 
 import { SIGTSTP } from 'constants';
 
@@ -254,18 +255,18 @@ class MyMap extends Component {
         this.state.drawingManager.setDrawingMode(
           window.google.maps.drawing.OverlayType.RECTANGLE
         );
-        console.log(
-          (Math.cos(marker.getPosition().lat()) * 40000) / 360 / (40000 / 360)
-        );
+        
 
         // 0.0002 *
         // ((Math.cos(marker.getPosition().lng()) * 40000) /
         //   360 /
         //   (40000 / 360))
-        this.state.drone = new Drone(
+        console.log('Drone :', Drone);
+        this.state.drone = new Drone.WrappedComponent(
           {
             position: pos,
-            speed: 0.000004,
+            // speed: 0.00004, 
+            speed: 0.00002, 
             overlayRadiusLat: 0.0002,
             overlayRadiusLng:
               0.0002 /
@@ -274,11 +275,11 @@ class MyMap extends Component {
                 (40000 / 360)), //
             direction: Math.PI / 2,
 
-            maxHeight: 0.01,
-            focusDistance: 0.001,
+            maxHeight: 0.0001,
+            focusDistance: 0.01,
             sensorA: 0.001,
-            sensorB: 0.002,
-            charge: 1000,
+            sensorB: 0.05,
+            charge: 10000000,
             flightCosts: 0,
             photoCosts: 0,
 
@@ -361,7 +362,6 @@ class MyMap extends Component {
     var path = poly.getPath();
     path.push(latLng);
     var encodeString = window.google.maps.geometry.encoding.encodePath(path);
-    console.log('encodeString :', encodeString);
     // if (encodeString) {
     //   document.getElementById('encoded-polyline').value = encodeString;
     // }
@@ -371,9 +371,9 @@ class MyMap extends Component {
     let that = this;
     this.state.drone.setField(this.state.field);
     this.state.drone.setBase(this.state.base);
-    let target = this.state.drone.findClosestPoint(
+    let target = this.state.drone.mapToCenter(this.state.drone.findClosestPoint(
       this.state.field.bounds.toArray()
-    );
+    ));
 
     
 
@@ -381,20 +381,55 @@ class MyMap extends Component {
     this.state.field.distributeOnSquares();
 
     let { field, drone, base } = this.state;
-    let data = JSON.parse(MainCalculation({base, field, drone}));
-    console.log('points :', data.PointsArr);
-    for(let p of data.PointsArr) {
-      let vp = new Vector(p.x, p.y);
-      this.state.drone.addToPath(this.state.drone.mapToCenter(vp));
+    console.log('field :', field.squaresArray);
+
+    for(let [it, p] of field.squaresArray.entries()) {
+      if(it % 2 !== 0) {
+        p = p.reverse();
+      }
+      for(let pp of p) {
+        let vpp = drone.mapToCenter(mapToVector(pp.bounds.center));
+        drone.addToPath(vpp);
+
+        let mark = new window.google.maps.Marker({
+          position: {
+            lat: vpp.getX(),
+            lng: vpp.getY()
+          },
+          map: this.state.map
+        });  
+      }
     }
 
-    // this.state.drone.addToPath(this.state.drone.mapToCenter(target));
+    // let data = JSON.parse(MainCalculation({base, field, drone}));
+    // for(let p of data.PointsArr) {
+    //   let vp = new Vector(p.x, p.y);
+    //   this.state.drone.addToPath(this.state.drone.mapToCenter(vp));
+    //   let mark = new window.google.maps.Marker({
+    //     position: {
+    //       lat: p.x, 
+    //       lng: p.y
+    //     },
+    //     map: this.state.map
+    //   });
+    // }
+
+    // console.log(data.PointsArr);
+    // console.log('target :', target);
+    //   let mark = new window.google.maps.Marker({
+    //     position: {
+    //       lat: target._x,
+    //       lng: target._y
+    //     },
+    //     map: this.state.map
+    //   });
+    // drone.addToPath(target);
+
     // for(let i = 0; i < data.)
     // this.state.drone.addToPath(this.state.drone.mapToCenter(target));
     
 
     this.update.call(that);
-    console.log('this.state.drone :', this.state.drone);
   }
 
   update() {
@@ -407,7 +442,7 @@ class MyMap extends Component {
     // requestAnimationFrame(this.update.call(this));
   }
 
-  testSetup() {}
+  
 
   render() {
     const { labels, currentLabelIdx, readyForStart } = this.state;

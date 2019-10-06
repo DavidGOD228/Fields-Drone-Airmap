@@ -74,7 +74,7 @@ class App extends Component {
                   to="/"
                   className="menu-item flex flex-col justify-start items-center content-center text-center w-full bg-blue-700 py-2 cursor-pointer"
                 >
-                  Load photos
+                  Photos
                 </Link>
               </div>
 

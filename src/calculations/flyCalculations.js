@@ -147,7 +147,7 @@ class Heli {
 
   AddPoint() {
     this.PointsArr.push(this.realCoords);
-    console.log(this.PointsArr);
+
   }
 
   optimalHeight(field) {
@@ -745,7 +745,6 @@ function Logic(heli, field) {
     }
     heli.GoToBase();
   }
-  console.log(heli);
 
   var json = JSON.stringify(heli);
 
@@ -793,6 +792,5 @@ function MainCalculation({
     drone.photoCosts,
     base
     );
-  // console.log('base, field, heli :', base, field, heli);
   return Logic(heli, field);
 }

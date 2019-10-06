@@ -35,11 +35,9 @@ class Vector {
   }
 
   distanceTo(v) {
-    // console.log('v :', v);
-    // console.log('this :', this);
+    
     // let newv = new Vector(v._x - this._x, v._y - this._y)
     // let d= newv.getLength();
-    // console.log('newv, d :', newv, d);
     // return new Vector(v._x - this._x, v._y - this._y).getLength();
     return new Vector(v._x - this._x, v._y - this._y).getLength();
   }

@@ -23,7 +23,6 @@ export default class PhotoGallery extends Component {
     let tempFiles = this.state.files;
 
     for(let i = 0; i < files.length; i++) {
-      console.log(files[i])
       tempFiles.push(URL.createObjectURL(files[i]));
     }
 
@@ -33,7 +32,6 @@ export default class PhotoGallery extends Component {
   }
 
   expandPhoto(idx) {
-    console.log('idx :', idx);
     this.setState(state => {
       return {
         expandedIdx: state.expandedIdx === -1 ? idx : -1

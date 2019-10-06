@@ -5,7 +5,6 @@ class Field {
     this.bounds = new Rectangle(bounds.tr, bounds.bl)
     this.width = this.bounds.tr.lat - this.bounds.tl.lat;
     this.height = this.bounds.tr.lng - this.bounds.br.lng;
-    console.log('width, height :', this.width, this.height);
   }
 
   setSquareRadius(r) {
@@ -16,17 +15,21 @@ class Field {
     let nWidth = Math.ceil(this.width / (this.squareRadius * 2)),
         nHeight = Math.ceil(this.height / (this.squareRadius * 2));
 
-    console.log('nWidth, nHeight :', nWidth, nHeight);
-
-    this.squaresArray = Array.from({ length: nWidth }, (el, i) => Array.from({
+    this.squaresArray = Array.from({ length: nWidth }, (el, x) => Array.from({
       length: nHeight
-    }, (ell) => {
+    }, (ell, y) => {
+      let xr = (this.width / nWidth);
+      let yr = (this.height / nHeight);
+
       return {
-        visited: false
+        visited: false,
+        bounds: Rectangle.newFromCenter({
+          lat: this.bounds.tl.lat + (((x/nWidth) * this.width) ),
+          lng: this.bounds.bl.lng + (((y/nHeight) * this.height) )
+        }, xr, yr)
+        // bounds: new Rectangle(this.bounds.tl.lat + ((x/nWidth) * this.width, this.bounds.tl.lng + ((y/nHeight) * this.height))
       }
     }))
-
-    console.log('this.squaresArray :', this.squaresArray);
   }
 }
 

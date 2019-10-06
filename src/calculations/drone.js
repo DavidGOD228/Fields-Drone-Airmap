@@ -1,9 +1,17 @@
+import React, { Component } from "react";
+
 import Vector from './Vector';
 import { mapToVector, vectorToMap, vectorMapProxy } from './helpers';
 import { MainCalculation } from '../calculations/flyCalculations';
+import { pushPhoto } from "../store/actions/photosGallery";
+import { connect } from "react-redux";
+import { compose } from "redux";
 
-class Drone {
+class Drone extends Component {
   constructor(options, window) {
+    super();
+    // super(props);
+    // console.log('this.props :', this.props);
     for (let o of Object.entries(options)) {
       this[o[0]] = o[1];
     }
@@ -18,6 +26,8 @@ class Drone {
     this.currentTargetIdx = 0;
     this.currentTarget = this.path[this.currentTargetIdx] || null;
     this.finishedFlight = false;
+
+    this.photos = [];
 
     this.window = window;
     this.marker = new window.google.maps.Marker(options);
@@ -78,23 +88,44 @@ class Drone {
   mapToCenter(p) {
     let pos = this.position;
     if (p.getX() > pos.getX() && p.getY() > pos.getY()) {
-      console.log('+ +');
       return p.add(new Vector(this.overlayRadiusLat, this.overlayRadiusLng));
     } else if (p.getX() > pos.getX() && p.getY() < pos.getY()) {
-      console.log('+ -');
       return p.add(new Vector(this.overlayRadiusLat, -this.overlayRadiusLng));
     } else if (p.getX() < pos.getX() && p.getY() > pos.getY()) {
-      console.log('- +');
       return p.add(new Vector(-this.overlayRadiusLat, this.overlayRadiusLng));
     } else if (p.getX() < pos.getX() && p.getY() < pos.getY()) {
-      console.log('- -');
       return p.add(new Vector(-this.overlayRadiusLat, -this.overlayRadiusLng));
     }
   }
 
   findPath() {}
 
-  makePhoto() {}
+  makePhoto(point, settings = {
+    size: "400x400",
+    zoom: 18,
+    maptype: "satellite",
+    key: "AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI"
+  }) {
+    const base = "https://maps.googleapis.com/maps/api/staticmap";
+    let link;
+
+    settings.center = point.lat + "," + point.lng;
+    link = this.mashLink(base, settings);
+
+    return link;
+  }
+
+  mashLink(base, params) {
+    const ps = Object.entries(params);
+    let res = base;
+
+    for(let i = 0; i < ps.length; i++) {
+      res += i === 0 ? "?" : "&";
+      res += ps[i][0] + "=" + ps[i][1];
+    }
+
+    return res;
+  }
 
   update() {
     if (this.targetMode) {
@@ -109,13 +140,17 @@ class Drone {
         if (this.currentTargetIdx + 1 < this.path.length) {
           this.currentTarget.reached = true;
           this.path[this.currentTargetIdx].reached = true;
-          this.currentTargetIdx++;
+          
+          // console.log('object :', this.makePhoto(vectorMapProxy(this.path[this.currentTargetIdx].position)));
+          this.photos.push(this.makePhoto(vectorMapProxy(this.path[this.currentTargetIdx].position)));
+          // this.props.pushPhoto(this.photos[this.photos.length - 1]);
 
+          this.currentTargetIdx++;
           this.currentTarget = this.path[this.currentTargetIdx];
         } else {
           this.velocity.setLength(0);
           this.finishedFlight = true;
-          console.log('shit');
+          console.log('this.photos :', this.photos);
         }
       }
       this.velocity.setAngle(this.angleTo(this.currentTarget.position));
@@ -151,4 +186,26 @@ class Drone {
   }
 }
 
-export default Drone;
+// export default Drone;
+
+
+let mapDispatchToProps = dispatch => {
+  return {
+    pushPhoto: length =>
+      dispatch(pushPhoto(length))
+  };
+};
+
+// let mapStateToProps = state => {
+//   return {
+//     photos: state.photos
+//   };
+// };
+
+export default 
+  compose(
+    connect(
+      // mapStateToProps,
+      mapDispatchToProps
+    )
+  )(Drone);

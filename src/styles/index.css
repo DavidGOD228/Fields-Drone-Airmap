@@ -3,6 +3,10 @@
 @tailwind components;
 @tailwind utilities;
 
+::-webkit-scrollbar {
+  display: none;
+}
+
 .click-scale-down {
   transition-duration: 0.1s;
 }
@@ -69,8 +73,7 @@
   max-width: 200px;
   border: 3px dashed black;
   border-radius: 15px;
-  margin-right: 10px;
-  margin-bottom: 10px;
+  margin: 5px;
   overflow: hidden;
   user-select: none;
 }
@@ -139,7 +142,7 @@
 
 .menu-container {
   overflow: hidden;
-	transition-duration: 0.5s;
+  transition-duration: 0.5s;
 }
 
 .menu-item {
@@ -154,24 +157,54 @@
 
 #help-container {
   position: absolute;
-	width: 100%;
-	height: 100%;
-	background: black;
-	z-index: 2;
-	opacity: 0.5;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 45px;
+  width: 100%;
+  height: 100%;
+  background: black;
+  z-index: 2;
+  opacity: 0.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 45px;
   pointer-events: none;
 }
 
 .start-flight-button {
   display: block;
-	position: absolute;
-	z-index: 2;
-	left: calc(50% - 60px);
-	bottom: 40px;
-	width: 120px;
+  position: absolute;
+  z-index: 2;
+  left: calc(50% - 60px);
+  bottom: 40px;
+  width: 120px;
   outline: none;
+}
+
+@keyframes blub-appear {
+  0% {
+    transform: scale(0);
+    height: 0;
+    border: none;
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.appear-anim {
+  animation: blub-appear 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.last-shots-container {
+  position: absolute;
+  transition-duration: 0.4s;
+  top: 0;
+  right: 0;
+  padding: 5px;
+  padding-top: 15px;
+  height: 100vh;
+  overflow: scroll;
+  background: -webkit-linear-gradient(to right, #1d2671, #c33764);
+  background: #0000ff42;
 }

@@ -11367,6 +11367,10 @@ video {
   z-index: auto;
 }
 
+::-webkit-scrollbar {
+  display: none;
+}
+
 .click-scale-down {
   transition-duration: 0.1s;
 }
@@ -11437,8 +11441,7 @@ video {
   max-width: 200px;
   border: 3px dashed black;
   border-radius: 15px;
-  margin-right: 10px;
-  margin-bottom: 10px;
+  margin: 5px;
   overflow: hidden;
   -webkit-user-select: none;
      -moz-user-select: none;
@@ -11545,6 +11548,52 @@ video {
   bottom: 40px;
   width: 120px;
   outline: none;
+}
+
+@-webkit-keyframes blub-appear {
+  0% {
+    transform: scale(0);
+    height: 0;
+    border: none;
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes blub-appear {
+  0% {
+    transform: scale(0);
+    height: 0;
+    border: none;
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.appear-anim {
+  -webkit-animation: blub-appear 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+          animation: blub-appear 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.last-shots-container {
+  position: absolute;
+  transition-duration: 0.4s;
+  top: 0;
+  right: 0;
+  padding: 5px;
+  padding-top: 15px;
+  height: 100vh;
+  overflow: scroll;
+  background: -webkit-linear-gradient(to right, #1d2671, #c33764);
+  background: #0000ff42;
 }
 
 @media (min-width: 640px) {

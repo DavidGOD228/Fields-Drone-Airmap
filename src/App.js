@@ -10,8 +10,7 @@ import {
 
 import Sidebar from './Layout/Sidebar';
 import PhotosGallery from './Layout/PhotosGallery';
-// import MyMap from "./Layout/Map";
-import MyMap from './Layout/MyMapTest';
+import MyMap from './Layout/MyMap';
 import VariablesBlock from './VariablesBlock';
 
 import './index.css';

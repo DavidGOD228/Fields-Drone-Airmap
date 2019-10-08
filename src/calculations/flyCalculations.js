@@ -80,10 +80,11 @@ class HeliZone {
   constructor(centre, a, b) {
     a /= 2;
     b /= 2;
+    
     this.Lu = new Point(0, 0, 0);
     this.Ru = new Point(0, 0, 0);
     this.Ld = new Point(0, 0, 0);
-    this.Rd = new Point(0, 0, 0);
+    this.Rd = new Point(0, 0, 0); 
 
     this.Lu.x = centre.x - b;
     this.Lu.y = centre.y + a;

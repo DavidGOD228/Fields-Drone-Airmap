@@ -1,17 +1,9 @@
-import React, { Component } from "react";
+import Vector from "./Vector";
+import { mapToVector, vectorToMap, vectorMapProxy } from "./helpers";
+import { MainCalculation } from "../calculations/flyCalculations";
 
-import Vector from './Vector';
-import { mapToVector, vectorToMap, vectorMapProxy } from './helpers';
-import { MainCalculation } from '../calculations/flyCalculations';
-import { pushPhoto } from "../store/actions/photosGallery";
-import { connect } from "react-redux";
-import { compose } from "redux";
-
-class Drone extends Component {
+class Drone {
   constructor(options, window) {
-    super();
-    // super(props);
-    // console.log('this.props :', this.props);
     for (let o of Object.entries(options)) {
       this[o[0]] = o[1];
     }
@@ -29,13 +21,16 @@ class Drone extends Component {
 
     this.photos = [];
 
+    this.started = false;
+    this.ended = false;
+
     this.window = window;
     this.marker = new window.google.maps.Marker(options);
     this.fieldOverlay = new window.google.maps.Rectangle({
-      strokeColor: '#FF0000',
+      strokeColor: "#FF0000",
       strokeOpacity: 0.8,
       strokeWeight: 2,
-      fillColor: '#FF0000',
+      fillColor: "#FF0000",
       fillOpacity: 0.35,
       map: this.map,
       bounds: {
@@ -100,12 +95,15 @@ class Drone extends Component {
 
   findPath() {}
 
-  makePhoto(point, settings = {
-    size: "400x400",
-    zoom: 18,
-    maptype: "satellite",
-    key: "AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI"
-  }) {
+  makePhoto(
+    point,
+    settings = {
+      size: "400x400",
+      zoom: 18,
+      maptype: "satellite",
+      key: "AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI"
+    }
+  ) {
     const base = "https://maps.googleapis.com/maps/api/staticmap";
     let link;
 
@@ -119,7 +117,7 @@ class Drone extends Component {
     const ps = Object.entries(params);
     let res = base;
 
-    for(let i = 0; i < ps.length; i++) {
+    for (let i = 0; i < ps.length; i++) {
       res += i === 0 ? "?" : "&";
       res += ps[i][0] + "=" + ps[i][1];
     }
@@ -128,6 +126,11 @@ class Drone extends Component {
   }
 
   update() {
+    if (!this.started) {
+      this.started = true;
+      this.startCallback();
+    }
+
     if (this.targetMode) {
       // let pVector = vectorMapProxy(mapToVector(p));
       if (!this.currentTarget && this.currentTargetIdx < this.path.length) {
@@ -140,17 +143,22 @@ class Drone extends Component {
         if (this.currentTargetIdx + 1 < this.path.length) {
           this.currentTarget.reached = true;
           this.path[this.currentTargetIdx].reached = true;
-          
-          // console.log('object :', this.makePhoto(vectorMapProxy(this.path[this.currentTargetIdx].position)));
-          this.photos.push(this.makePhoto(vectorMapProxy(this.path[this.currentTargetIdx].position)));
-          // this.props.pushPhoto(this.photos[this.photos.length - 1]);
+
+          this.photos.push(
+            this.makePhoto(
+              vectorMapProxy(this.path[this.currentTargetIdx].position)
+            )
+          );
+          this.pushPhoto(this.photos[this.photos.length - 1]);
 
           this.currentTargetIdx++;
           this.currentTarget = this.path[this.currentTargetIdx];
         } else {
           this.velocity.setLength(0);
           this.finishedFlight = true;
-          console.log('this.photos :', this.photos);
+          console.log("this.photos :", this.photos);
+          this.ended = true;
+          this.endCallback();
         }
       }
       this.velocity.setAngle(this.angleTo(this.currentTarget.position));
@@ -186,26 +194,4 @@ class Drone extends Component {
   }
 }
 
-// export default Drone;
-
-
-let mapDispatchToProps = dispatch => {
-  return {
-    pushPhoto: length =>
-      dispatch(pushPhoto(length))
-  };
-};
-
-// let mapStateToProps = state => {
-//   return {
-//     photos: state.photos
-//   };
-// };
-
-export default 
-  compose(
-    connect(
-      // mapStateToProps,
-      mapDispatchToProps
-    )
-  )(Drone);
+export default Drone;

@@ -1,7 +1,11 @@
-import Vector from "./Vector";
-import { mapToVector, vectorToMap, vectorMapProxy } from "./helpers";
-import { MainCalculation } from "../calculations/flyCalculations";
-
+import Vector from './Vector';
+import { mapToVector, vectorToMap, vectorMapProxy } from './helpers';
+import { MainCalculation } from '../calculations/flyCalculations';
+import Photo from '../calculations/Photo';
+Photo.saveURL(
+  'https://upload.wikimedia.org/wikipedia/en/thumb/6/63/IMG_%28business%29.svg/1200px-IMG_%28business%29.svg.png',
+  'qwerty.png'
+);
 class Drone {
   constructor(options, window) {
     for (let o of Object.entries(options)) {
@@ -27,10 +31,10 @@ class Drone {
     this.window = window;
     this.marker = new window.google.maps.Marker(options);
     this.fieldOverlay = new window.google.maps.Rectangle({
-      strokeColor: "#FF0000",
+      strokeColor: '#FF0000',
       strokeOpacity: 0.8,
       strokeWeight: 2,
-      fillColor: "#FF0000",
+      fillColor: '#FF0000',
       fillOpacity: 0.35,
       map: this.map,
       bounds: {
@@ -40,6 +44,9 @@ class Drone {
         west: this.position.lng - this.overlayRadiusLng
       }
     });
+    console.log(
+      Photo.uploadIMG('C/:Users/dtrum/Desktop/image.png', this.window.fs)
+    );
   }
 
   addToPath(v) {
@@ -98,16 +105,16 @@ class Drone {
   makePhoto(
     point,
     settings = {
-      size: "400x400",
+      size: '400x400',
       zoom: 18,
-      maptype: "satellite",
-      key: "AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI"
+      maptype: 'satellite',
+      key: 'AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI'
     }
   ) {
-    const base = "https://maps.googleapis.com/maps/api/staticmap";
+    const base = 'https://maps.googleapis.com/maps/api/staticmap';
     let link;
 
-    settings.center = point.lat + "," + point.lng;
+    settings.center = point.lat + ',' + point.lng;
     link = this.mashLink(base, settings);
 
     return link;
@@ -118,8 +125,8 @@ class Drone {
     let res = base;
 
     for (let i = 0; i < ps.length; i++) {
-      res += i === 0 ? "?" : "&";
-      res += ps[i][0] + "=" + ps[i][1];
+      res += i === 0 ? '?' : '&';
+      res += ps[i][0] + '=' + ps[i][1];
     }
 
     return res;
@@ -156,7 +163,7 @@ class Drone {
         } else {
           this.velocity.setLength(0);
           this.finishedFlight = true;
-          console.log("this.photos :", this.photos);
+          console.log('this.photos :', this.photos);
           this.ended = true;
           this.endCallback();
         }

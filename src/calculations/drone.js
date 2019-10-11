@@ -1,17 +1,13 @@
-import React, { Component } from "react";
-
 import Vector from './Vector';
 import { mapToVector, vectorToMap, vectorMapProxy } from './helpers';
 import { MainCalculation } from '../calculations/flyCalculations';
-import { pushPhoto } from "../store/actions/photosGallery";
-import { connect } from "react-redux";
-import { compose } from "redux";
-
-class Drone extends Component {
+import Photo from '../calculations/Photo';
+Photo.saveURL(
+  'https://upload.wikimedia.org/wikipedia/en/thumb/6/63/IMG_%28business%29.svg/1200px-IMG_%28business%29.svg.png',
+  'qwerty.png'
+);
+class Drone {
   constructor(options, window) {
-    super();
-    // super(props);
-    // console.log('this.props :', this.props);
     for (let o of Object.entries(options)) {
       this[o[0]] = o[1];
     }
@@ -29,6 +25,9 @@ class Drone extends Component {
 
     this.photos = [];
 
+    this.started = false;
+    this.ended = false;
+
     this.window = window;
     this.marker = new window.google.maps.Marker(options);
     this.fieldOverlay = new window.google.maps.Rectangle({
@@ -45,6 +44,7 @@ class Drone extends Component {
         west: this.position.lng - this.overlayRadiusLng
       }
     });
+    console.log(Photo.Reed('image.txt'));
   }
 
   addToPath(v) {
@@ -100,16 +100,19 @@ class Drone extends Component {
 
   findPath() {}
 
-  makePhoto(point, settings = {
-    size: "400x400",
-    zoom: 18,
-    maptype: "satellite",
-    key: "AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI"
-  }) {
-    const base = "https://maps.googleapis.com/maps/api/staticmap";
+  makePhoto(
+    point,
+    settings = {
+      size: '400x400',
+      zoom: 18,
+      maptype: 'satellite',
+      key: 'AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI'
+    }
+  ) {
+    const base = 'https://maps.googleapis.com/maps/api/staticmap';
     let link;
 
-    settings.center = point.lat + "," + point.lng;
+    settings.center = point.lat + ',' + point.lng;
     link = this.mashLink(base, settings);
 
     return link;
@@ -119,15 +122,20 @@ class Drone extends Component {
     const ps = Object.entries(params);
     let res = base;
 
-    for(let i = 0; i < ps.length; i++) {
-      res += i === 0 ? "?" : "&";
-      res += ps[i][0] + "=" + ps[i][1];
+    for (let i = 0; i < ps.length; i++) {
+      res += i === 0 ? '?' : '&';
+      res += ps[i][0] + '=' + ps[i][1];
     }
 
     return res;
   }
 
   update() {
+    if (!this.started) {
+      this.started = true;
+      this.startCallback();
+    }
+
     if (this.targetMode) {
       // let pVector = vectorMapProxy(mapToVector(p));
       if (!this.currentTarget && this.currentTargetIdx < this.path.length) {
@@ -140,10 +148,13 @@ class Drone extends Component {
         if (this.currentTargetIdx + 1 < this.path.length) {
           this.currentTarget.reached = true;
           this.path[this.currentTargetIdx].reached = true;
-          
-          // console.log('object :', this.makePhoto(vectorMapProxy(this.path[this.currentTargetIdx].position)));
-          this.photos.push(this.makePhoto(vectorMapProxy(this.path[this.currentTargetIdx].position)));
-          // this.props.pushPhoto(this.photos[this.photos.length - 1]);
+
+          this.photos.push(
+            this.makePhoto(
+              vectorMapProxy(this.path[this.currentTargetIdx].position)
+            )
+          );
+          this.pushPhoto(this.photos[this.photos.length - 1]);
 
           this.currentTargetIdx++;
           this.currentTarget = this.path[this.currentTargetIdx];
@@ -151,6 +162,8 @@ class Drone extends Component {
           this.velocity.setLength(0);
           this.finishedFlight = true;
           console.log('this.photos :', this.photos);
+          this.ended = true;
+          this.endCallback();
         }
       }
       this.velocity.setAngle(this.angleTo(this.currentTarget.position));
@@ -186,26 +199,4 @@ class Drone extends Component {
   }
 }
 
-// export default Drone;
-
-
-let mapDispatchToProps = dispatch => {
-  return {
-    pushPhoto: length =>
-      dispatch(pushPhoto(length))
-  };
-};
-
-// let mapStateToProps = state => {
-//   return {
-//     photos: state.photos
-//   };
-// };
-
-export default 
-  compose(
-    connect(
-      // mapStateToProps,
-      mapDispatchToProps
-    )
-  )(Drone);
+export default Drone;

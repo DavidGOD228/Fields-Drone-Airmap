@@ -1,6 +1,15 @@
 import Vector from "./Vector";
-import { mapToVector, vectorToMap, vectorMapProxy } from "./helpers";
+import {
+  mapToVector,
+  vectorToMap,
+  vectorMapProxy,
+  directionEnum,
+  getEnumDirection,
+  numToDirection,
+  getDirectionLabel
+} from "./helpers";
 import { MainCalculation } from "../calculations/flyCalculations";
+import Photo from "../calculations/Photo";
 
 class Drone {
   constructor(options, window) {
@@ -15,6 +24,7 @@ class Drone {
 
     this.targetMode = this.targetMode || false;
     this.path = this.path || [];
+    this.coveredPath = [];
     this.currentTargetIdx = 0;
     this.currentTarget = this.path[this.currentTargetIdx] || null;
     this.finishedFlight = false;
@@ -137,10 +147,12 @@ class Drone {
         this.currentTarget = this.path[this.currentTargetIdx];
       }
 
-      let d = this.position.distanceTo(this.currentTarget.position);
+      var d = this.currentTarget
+        ? this.position.distanceTo(this.currentTarget.position)
+        : -Infinity;
 
       if (d <= this.velocity.getLength()) {
-        if (this.currentTargetIdx + 1 < this.path.length) {
+        if (this.currentTargetIdx < this.path.length) {
           this.currentTarget.reached = true;
           this.path[this.currentTargetIdx].reached = true;
 
@@ -149,10 +161,40 @@ class Drone {
               vectorMapProxy(this.path[this.currentTargetIdx].position)
             )
           );
-          this.pushPhoto(this.photos[this.photos.length - 1]);
+
+          console.log(
+            "val, label :",
+            getEnumDirection(this.velocity.getAngleFull()),
+            getDirectionLabel(this.velocity.getAngleFull())
+          );
+
+          let droneDir = getEnumDirection(this.velocity.getAngleFull());
+          let photo = new Photo(
+            { url: this.photos[this.photos.length - 1] },
+            { droneDir }
+          );
+          this.pushPhoto(photo);
+          Photo.downloadUrl(photo.url, photo.url);
+
+          let coveredRect = new window.google.maps.Rectangle({
+            strokeColor: "#FF0000",
+            strokeOpacity: 0.8,
+            strokeWeight: 0,
+            fillColor: "#FF0000",
+            fillOpacity: 0.35,
+            map: this.map,
+            bounds: {
+              north: this.position.lat + this.overlayRadiusLat,
+              south: this.position.lat - this.overlayRadiusLat,
+              east: this.position.lng + this.overlayRadiusLng,
+              west: this.position.lng - this.overlayRadiusLng
+            }
+          });
+
+          this.coveredPath.push(coveredRect);
 
           this.currentTargetIdx++;
-          this.currentTarget = this.path[this.currentTargetIdx];
+          this.currentTarget = this.path[this.currentTargetIdx] || null;
         } else {
           this.velocity.setLength(0);
           this.finishedFlight = true;
@@ -161,7 +203,9 @@ class Drone {
           this.endCallback();
         }
       }
-      this.velocity.setAngle(this.angleTo(this.currentTarget.position));
+      if (this.currentTarget) {
+        this.velocity.setAngle(this.angleTo(this.currentTarget.position));
+      }
     }
 
     this.position.addTo(this.velocity);

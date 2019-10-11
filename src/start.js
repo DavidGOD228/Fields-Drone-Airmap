@@ -1,14 +1,18 @@
-const electron = require('electron')
-const app = electron.app
-const BrowserWindow = electron.BrowserWindow
+const electron = require('electron');
+const app = electron.app;
+const BrowserWindow = electron.BrowserWindow;
+const path = require('path');
+const url = require('url');
 
-const path = require('path')
-const url = require('url')
-
-let mainWindow
+let mainWindow;
+var fs = require('fs');
 
 function createWindow() {
-  mainWindow = new BrowserWindow({ width: 800, height: 600 })
+  fs.appendFile('image.txt', 'Hello content!', function(err) {
+    if (err) throw err;
+    console.log('Saved!');
+  });
+  mainWindow = new BrowserWindow({ width: 800, height: 600 });
 
   mainWindow.loadURL(
     process.env.ELECTRON_START_URL ||
@@ -17,23 +21,23 @@ function createWindow() {
         protocol: 'file:',
         slashes: true
       })
-  )
+  );
 
   mainWindow.on('closed', () => {
-    mainWindow = null
-  })
+    mainWindow = null;
+  });
 }
 
-app.on('ready', createWindow)
+app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit()
+    app.quit();
   }
-})
+});
 
 app.on('activate', () => {
   if (mainWindow === null) {
-    createWindow()
+    createWindow();
   }
-})
+});

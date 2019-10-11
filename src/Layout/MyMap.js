@@ -12,8 +12,9 @@ import Rectangle from "../calculations/Rectangle.js";
 import Drone from "../calculations/drone.js";
 import Vector from "../calculations/Vector";
 import Field from "../calculations/Field";
+import RectField from "../calculations/RectField";
 import { MainCalculation } from "../calculations/flyCalculations";
-import { mapToVector } from "../calculations/helpers";
+import { mapToVector, vectorToMap } from "../calculations/helpers";
 import { pushPhoto } from "../store/actions/photosGallery";
 import Photo from "../calculations/Photo";
 import { scrollDown } from "../components/helpers";
@@ -175,8 +176,12 @@ class MyMap extends Component {
         }
         // FIXME: not customizable at all
 
+        let field = new Field({
+          polyArr
+        });
+        console.log("polyArr :", polyArr);
         this.setState({
-          field: polyArr
+          field
         });
 
         if (!this.state.labels[this.state.currentLabelIdx + 1]) {
@@ -190,8 +195,6 @@ class MyMap extends Component {
             currentLabelIdx: state.currentLabelIdx + 1
           };
         });
-
-        // this.stopDrawing();
       }
     );
 
@@ -209,9 +212,7 @@ class MyMap extends Component {
             lat: bounds.getSouthWest().lat(),
             lng: bounds.getSouthWest().lng()
           };
-
-        // let myRect = new Rectangle(tr, bl);
-        let field = new Field({
+        let field = new RectField({
           bounds: {
             tr,
             bl
@@ -262,7 +263,7 @@ class MyMap extends Component {
         });
 
         this.state.drawingManager.setDrawingMode(
-          window.google.maps.drawing.OverlayType.RECTANGLE
+          window.google.maps.drawing.OverlayType.POLYGON
         );
 
         // 0.0002 *
@@ -408,15 +409,22 @@ class MyMap extends Component {
       }
       for (let pp of p) {
         let vpp = drone.mapToCenter(mapToVector(pp.bounds.center));
-        drone.addToPath(vpp);
+        console.log("vpp :", vectorToMap(vpp));
+        console.log(
+          "field.isPointInside(vpp) :",
+          field.isPointInside(vectorToMap(vpp))
+        );
+        if (field.isPointInside(vectorToMap(vpp))) {
+          drone.addToPath(vpp);
 
-        let mark = new window.google.maps.Marker({
-          position: {
-            lat: vpp.getX(),
-            lng: vpp.getY()
-          },
-          map: this.state.map
-        });
+          let mark = new window.google.maps.Marker({
+            position: {
+              lat: vpp.getX(),
+              lng: vpp.getY()
+            },
+            map: this.state.map
+          });
+        }
       }
     }
 
@@ -487,11 +495,12 @@ class MyMap extends Component {
         ></div>
 
         <div className="last-shots-container">
-          {this.props.photos.photos.length &&
+          {this.props.photos.photos.length > 0 &&
             this.props.photos.photos.map((f, idx) => (
               <div
                 className={`appear-anim photo-gallery-item  ${this.state
                   .expandedIdx === idx && "photo-gallery-item-expanded"}`}
+                key={f.url}
               >
                 <div
                   className="photo-expand-button icon-wrapper click-scale-down text-white"
@@ -502,7 +511,7 @@ class MyMap extends Component {
                     onClick={this.toggleTopBottom}
                   />
                 </div>
-                <img src={f} key={f} />
+                <img src={f.url} />
               </div>
             ))}
         </div>

@@ -1,5 +1,5 @@
 import sightengine from "sightengine";
-import mergeImg from "merge-img";
+// import mergeImg from "merge-img";
 // import Jimp from "jimp/es";
 
 // const fs = require("fs");
@@ -30,10 +30,10 @@ class Photo {
   }
 
   static merge() {
-    mergeImg(["image-1.png", "image-2.jpg"]).then(img => {
-      // Save image as file
-      img.write("out.png", () => console.log("done"));
-    });
+    // mergeImg(["image-1.png", "image-2.jpg"]).then(img => {
+    //   // Save image as file
+    //   img.write("out.png", () => console.log("done"));
+    // });
   }
 
   static downloadUrl(url, fileName) {

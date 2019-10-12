@@ -11,11 +11,6 @@ import {
 import { MainCalculation } from "../calculations/flyCalculations";
 import Photo from "../calculations/Photo";
 
-Photo.saveURL(
-  'https://upload.wikimedia.org/wikipedia/en/thumb/6/63/IMG_%28business%29.svg/1200px-IMG_%28business%29.svg.png',
-  'qwerty.png'
-);
-
 class Drone {
   constructor(options, window) {
     for (let o of Object.entries(options)) {
@@ -26,6 +21,8 @@ class Drone {
     this.velocity.setAngle(this.direction || 0);
 
     this.position = vectorMapProxy(mapToVector(this.position));
+
+    console.log('DRONE FLIGHT NUMBER :', this.flightNumber);
 
     this.targetMode = this.targetMode || false;
     this.path = this.path || [];
@@ -125,6 +122,9 @@ class Drone {
     settings.center = point.lat + "," + point.lng;
     link = this.mashLink(base, settings);
 
+    let filePath = this.folderPath + "/" + this.photos.length.toString().concat(".jpg");
+    Photo.downloadUrl(filePath, link);
+
     return link;
   }
 
@@ -205,6 +205,8 @@ class Drone {
           this.finishedFlight = true;
           console.log("this.photos :", this.photos);
           this.ended = true;
+
+          Photo.mergeTwo(this.folderPath, "1.jpg", "2.jpg");
           this.endCallback();
         }
       }

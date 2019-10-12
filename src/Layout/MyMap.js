@@ -19,6 +19,15 @@ import { pushPhoto } from "../store/actions/photosGallery";
 import Photo from "../calculations/Photo";
 import { scrollDown } from "../components/helpers";
 
+const fs = window.require("fs");
+let flightNumber, folderPath;
+
+fs.readFile("flight_number.txt", function(err, buf) {
+  flightNumber = buf.toString();
+  folderPath= "./Photos/Flight" + flightNumber;
+  console.log("Flight number: ", buf.toString());
+});
+
 class MyMap extends Component {
   constructor(props) {
     super(props);
@@ -292,6 +301,7 @@ class MyMap extends Component {
             flightCosts: 0,
             photoCosts: 0,
             pushPhoto: this.props.pushPhoto,
+            folderPath: folderPath,
 
             startCallback: () => {
               this.state.scrollInterval = setInterval(() => {
@@ -389,7 +399,16 @@ class MyMap extends Component {
 
   startFlight() {
     // this.props.pushPhoto("photo");
+
     // console.log('pushed :');
+    
+    if (!fs.existsSync(folderPath)){
+      fs.mkdirSync(folderPath);
+    }
+
+    fs.writeFile('flight_number.txt', parseInt(flightNumber) + 1, function(){console.log('done')})
+
+
     let that = this;
     this.state.drone.setField(this.state.field);
     this.state.drone.setBase(this.state.base);
@@ -500,7 +519,7 @@ class MyMap extends Component {
               <div
                 className={`appear-anim photo-gallery-item  ${this.state
                   .expandedIdx === idx && "photo-gallery-item-expanded"}`}
-                key={Math.random()}
+                key={f.url}
               >
                 <div
                   className="photo-expand-button icon-wrapper click-scale-down text-white"

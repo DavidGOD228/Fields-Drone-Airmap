@@ -5,14 +5,23 @@ const path = require('path');
 const url = require('url');
 
 let mainWindow;
+
 var fs = require('fs');
+const http = require('http');
 
 function createWindow() {
-  fs.appendFile('image.txt', 'Hello content!', function(err) {
+  fs.appendFile('kek.txt', 'Hello content!', function(err) {
     if (err) throw err;
     console.log('Saved!');
   });
-  mainWindow = new BrowserWindow({ width: 800, height: 600 });
+  mainWindow = new BrowserWindow({ 
+    width: 800,
+    height: 600,
+    webPreferences: {
+      nodeIntegration: true
+    } 
+  });
+
 
   mainWindow.loadURL(
     process.env.ELECTRON_START_URL ||

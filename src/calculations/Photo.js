@@ -1,7 +1,11 @@
 import sightengine from "sightengine";
+<<<<<<< HEAD
 
 const mergeImg = window.require('merge-img');
 const jimp = window.require('jimp');
+=======
+const mergeImg = window.require('merge-img');
+>>>>>>> e383858790a52c1c3773bdb4e49a546388974583
 const fs = window.require('fs');
 const http = window.require('http');
 const https = window.require('https')
@@ -14,6 +18,7 @@ const path = window.require('path')
 // console.log("fs :", fs);
 let se = sightengine("540865617", "38b6kZYxVz6DyZLGv82G");
 console.log("se :", se);
+
 
 class Photo {
   constructor({ url }, additional) {
@@ -82,6 +87,7 @@ class Photo {
       });
   }
 
+<<<<<<< HEAD
   static async getUrlBlurFactor(url) {
     return await se
       .check(["properties"])
@@ -106,6 +112,28 @@ class Photo {
       }).catch(function(err) {
         // Error
       });
+=======
+  // static async getUrlBlur(url) {
+  //   return await sightengine
+  //     .check(["properties"])
+  //     .set_url(
+  //       "https://sightengine.com/assets/img/examples/example-prop-c1.jpg"
+  //     )
+  //     .then(function(result) {
+  //       console.log("RESULT IMAGE :", result);
+  //     })
+  //     .catch(function(err) {
+  //       // Handl e error
+  //     });
+  // }
+
+  static saveURL(url, ImgDir) {
+    FileSaver.saveAs(url, ImgDir);
+  }
+  static saveOBJ(file, ImgDir) {
+    var file = new File(file, ImgDir, { type: 'img' });
+    FileSaver.saveAs(file);
+>>>>>>> e383858790a52c1c3773bdb4e49a546388974583
   }
 }
 

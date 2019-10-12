@@ -22,6 +22,7 @@ function createWindow() {
     } 
   });
 
+
   mainWindow.loadURL(
     process.env.ELECTRON_START_URL ||
       url.format({
@@ -49,24 +50,3 @@ app.on('activate', () => {
     createWindow();
   }
 });
-
-const downloadUrlToFile = (filename, url) => {
-  const file = fs.createWriteStream("FIRST_PHOTO.jpg");
-  const request = http.get("http://i3.ytimg.com/vi/J---aiyznGQ/mqdefault.jpg", function(response) {
-    response.pipe(file);
-  });
-}
-
-  // downloadUrlToFile();
-
-global.gbshit_downloadUrlToFile = downloadUrlToFile;
-
-module.exports = {
-  downloadUrlToFile: downloadUrlToFile
-  // downloadUrlToFile: (filename, url) => {
-  //   const file = fs.createWriteStream("file.jpg");
-  //   const request = http.get("http://i3.ytimg.com/vi/J---aiyznGQ/mqdefault.jpg", function(response) {
-  //     response.pipe(file);
-  //   });
-  // }
-}

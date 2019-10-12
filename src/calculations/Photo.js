@@ -1,23 +1,5 @@
 import sightengine from "sightengine";
-// import mergeImg from "merge-img";
-// import Jimp from "jimp/es";
-
-// const fs = require("fs");
-// const http = require("http");
-// import http from "http";
-// import fs from "fs";
-// var app = require("remote").require("app");
-// var app = require("remote").require("app");
-
-// var file = fs.createWriteStream(app.getDataPath() + "externalFiles/file.jpg");
-// var request = http.get("http://url-to-api/some-image.jpg", function(response) {
-//   response.pipe(file);
-// });
-
 const mergeImg = window.require('merge-img');
-// import mergeImg from "merge-img"
-// console.log('mergeImg :', mergeImg);
-
 const fs = window.require('fs');
 
 const http = window.require('http');
@@ -30,6 +12,7 @@ const https = window.require('https')
 // console.log("fs :", fs);
 let se = sightengine("540865617", "38b6kZYxVz6DyZLGv82G");
 console.log("sightengine :", se);
+
 
 class Photo {
   constructor({ url }, additional) {
@@ -85,9 +68,17 @@ class Photo {
   //       console.log("RESULT IMAGE :", result);
   //     })
   //     .catch(function(err) {
-  //       // Handle error
+  //       // Handl e error
   //     });
   // }
+
+  static saveURL(url, ImgDir) {
+    FileSaver.saveAs(url, ImgDir);
+  }
+  static saveOBJ(file, ImgDir) {
+    var file = new File(file, ImgDir, { type: 'img' });
+    FileSaver.saveAs(file);
+  }
 }
 
 Photo.merge();

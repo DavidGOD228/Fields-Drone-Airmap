@@ -14,6 +14,19 @@ import sightengine from "sightengine";
 //   response.pipe(file);
 // });
 
+const mergeImg = window.require('merge-img');
+// import mergeImg from "merge-img"
+// console.log('mergeImg :', mergeImg);
+
+const fs = window.require('fs');
+
+const http = window.require('http');
+const https = window.require('https')
+
+// console.log('mergeImg :', mergeImg);
+
+// downloadUrlToFile("Second_PHOTO.jpg", "http://i3.ytimg.com/vi/J---aiyznGQ/mqdefault.jpg");
+
 // console.log("fs :", fs);
 let se = sightengine("540865617", "38b6kZYxVz6DyZLGv82G");
 console.log("sightengine :", se);
@@ -29,19 +42,30 @@ class Photo {
     this.url = url;
   }
 
-  static merge() {
-    // mergeImg(["image-1.png", "image-2.jpg"]).then(img => {
-    //   // Save image as file
-    //   img.write("out.png", () => console.log("done"));
-    // });
+  static mergeTwo(path, name1, name2) {
+    const filename1 = path + "/" + name1, 
+          filename2 = path + "/" + name2;
+    mergeImg([filename1, filename2])
+      .then((img) => {
+      img.write(path + '/outmap.jpg', () => console.log('done'));
+    });
   }
 
-  static downloadUrl(url, fileName) {
-    // console.log("fs :", fs);
-    // const file = fs.createWriteStream(fileName);
-    // const request = http.get(url, function(response) {
-    //   response.pipe(file);
-    // });
+  static merge() {
+    const path = "./Photos/Flight29/";
+    mergeImg([path + "outmap1.jpg", path + "outmap.jpg"], {
+      direction: true
+    })
+      .then((img) => {
+      img.write(path + '/outmap1.jpg', () => console.log('done'));
+    });
+  }
+
+  static downloadUrl(filename, url) { 
+    const file = fs.createWriteStream(filename);
+    const request = https.get(url, function(response) {
+      response.pipe(file);
+    });
   }
 
   blurBase64() {
@@ -65,5 +89,9 @@ class Photo {
   //     });
   // }
 }
+
+Photo.merge();
+
+// Photo.downloadUrl("ThIRD_PHOTO.jpg", "http://i3.ytimg.com/vi/J---aiyznGQ/mqdefault.jpg")
 
 export default Photo;

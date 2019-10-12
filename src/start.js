@@ -5,14 +5,22 @@ const path = require('path');
 const url = require('url');
 
 let mainWindow;
+
 var fs = require('fs');
+const http = require('http');
 
 function createWindow() {
-  fs.appendFile('image.txt', 'Hello content!', function(err) {
+  fs.appendFile('kek.txt', 'Hello content!', function(err) {
     if (err) throw err;
     console.log('Saved!');
   });
-  mainWindow = new BrowserWindow({ width: 800, height: 600 });
+  mainWindow = new BrowserWindow({ 
+    width: 800,
+    height: 600,
+    webPreferences: {
+      nodeIntegration: true
+    } 
+  });
 
   mainWindow.loadURL(
     process.env.ELECTRON_START_URL ||
@@ -41,3 +49,24 @@ app.on('activate', () => {
     createWindow();
   }
 });
+
+const downloadUrlToFile = (filename, url) => {
+  const file = fs.createWriteStream("FIRST_PHOTO.jpg");
+  const request = http.get("http://i3.ytimg.com/vi/J---aiyznGQ/mqdefault.jpg", function(response) {
+    response.pipe(file);
+  });
+}
+
+  // downloadUrlToFile();
+
+global.gbshit_downloadUrlToFile = downloadUrlToFile;
+
+module.exports = {
+  downloadUrlToFile: downloadUrlToFile
+  // downloadUrlToFile: (filename, url) => {
+  //   const file = fs.createWriteStream("file.jpg");
+  //   const request = http.get("http://i3.ytimg.com/vi/J---aiyznGQ/mqdefault.jpg", function(response) {
+  //     response.pipe(file);
+  //   });
+  // }
+}

@@ -22,6 +22,8 @@ class Drone {
 
     this.position = vectorMapProxy(mapToVector(this.position));
 
+    console.log('DRONE FLIGHT NUMBER :', this.flightNumber);
+
     this.targetMode = this.targetMode || false;
     this.path = this.path || [];
     this.coveredPath = [];
@@ -120,6 +122,9 @@ class Drone {
     settings.center = point.lat + "," + point.lng;
     link = this.mashLink(base, settings);
 
+    let filePath = this.folderPath + "/" + this.photos.length.toString().concat(".jpg");
+    Photo.downloadUrl(filePath, link);
+
     return link;
   }
 
@@ -174,7 +179,7 @@ class Drone {
             { droneDir }
           );
           this.pushPhoto(photo);
-          Photo.downloadUrl(photo.url, photo.url);
+          // Photo.downloadUrl(photo.url, photo.url);
 
           let coveredRect = new window.google.maps.Rectangle({
             strokeColor: "#FF0000",
@@ -200,6 +205,8 @@ class Drone {
           this.finishedFlight = true;
           console.log("this.photos :", this.photos);
           this.ended = true;
+
+          Photo.mergeTwo(this.folderPath, "1.jpg", "2.jpg");
           this.endCallback();
         }
       }

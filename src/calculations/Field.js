@@ -3,9 +3,10 @@ import Vector from "./Vector.js";
 import { vectorMapProxy, vectorToMap } from "./helpers.js";
 
 class Field {
-  constructor({ polyArr }) {
+  constructor({ polyArr, map }) {
     console.log("polyARRRRR :", polyArr);
     this.polyArr = polyArr;
+    this.map = map;
     let minX = polyArr.reduce((acc, cur) => {
         return cur.lat < acc.lat ? cur : acc;
       }).lat,
@@ -32,26 +33,21 @@ class Field {
     this.width = this.bounds.tr.lat - this.bounds.tl.lat;
     this.height = this.bounds.tr.lng - this.bounds.br.lng;
 
-    this.rectBounds = new window.google.maps.Rectangle({
-      strokeColor: "#FF0000",
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
-      fillColor: "#FF0000",
-      fillOpacity: 0.35,
-      map: this.map,
-      // bounds: {
-      //   north: this.bounds.tl.lat,
-      //   south: this.bounds.bl.lat,
-      //   east: this.bounds.tr.lng,
-      //   west: this.bounds.tl.lng
-      // }
-      bounds: {
-        north: this.bounds.center.lat + this.bounds.xr,
-        south: this.bounds.center.lat - this.bounds.xr,
-        east: this.bounds.center.lng + this.bounds.yr,
-        west: this.bounds.center.lng - this.bounds.yr
-      }
-    });
+    // this.rectBounds = new window.google.maps.Rectangle({
+    //   strokeColor: "#FF0000",
+    //   strokeOpacity: 0.8,
+    //   strokeWeight: 2,
+    //   fillColor: "#FF0000",
+    //   fillOpacity: 0.35,
+    //   map: this.map,
+    //   bounds: {
+    //     north: this.bounds.center.lat + this.bounds.xr,
+    //     south: this.bounds.center.lat - this.bounds.xr,
+    //     east:  this.bounds.center.lng + this.bounds.yr,
+    //     west:  this.bounds.center.lng - this.bounds.yr
+    //   }
+    // });
+    
   }
 
   setSquareRadius(r) {
@@ -78,7 +74,7 @@ class Field {
   }
 
   distributeOnSquares() {
-    let nWidth = Math.ceil(this.width / (this.squareRadius * 2)),
+    let nWidth = Math.ceil(this.width / (this.squareRadius * 2)) ,
       nHeight = Math.ceil(this.height / (this.squareRadius * 2));
 
     this.squaresArray = Array.from({ length: nWidth }, (el, x) =>
@@ -87,19 +83,31 @@ class Field {
           length: nHeight
         },
         (ell, y) => {
-          let xr = this.width / nWidth;
-          let yr = this.height / nHeight;
+          let xr = (this.width / nWidth );
+          let yr = (this.height / nHeight);
+          let bounds = Rectangle.newFromCenter({
+                lat: this.bounds.tl.lat + (x / nWidth) * this.width,
+                lng: this.bounds.bl.lng + (y / nHeight) * this.height
+              }, xr, yr)
+
+          let coveredRect = new window.google.maps.Rectangle({
+            strokeColor: "#FFFF00",
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: "#00FF00",
+            fillOpacity: 0.35,
+            map: this.map,
+            bounds: {
+              north: bounds.center.lat + bounds.xr,
+              south: bounds.center.lat - bounds.xr,
+              east:  bounds.center.lng + bounds.yr,
+              west:  bounds.center.lng - bounds.yr
+            }
+          });
 
           return {
             visited: false,
-            bounds: Rectangle.newFromCenter(
-              {
-                lat: this.bounds.tl.lat + (x / nWidth) * this.width,
-                lng: this.bounds.bl.lng + (y / nHeight) * this.height
-              },
-              xr,
-              yr
-            )
+            bounds
             // bounds: new Rectangle(this.bounds.tl.lat + ((x/nWidth) * this.width, this.bounds.tl.lng + ((y/nHeight) * this.height))
           };
         }

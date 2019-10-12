@@ -1,11 +1,8 @@
 import sightengine from "sightengine";
-<<<<<<< HEAD
 
 const mergeImg = window.require('merge-img');
 const jimp = window.require('jimp');
-=======
-const mergeImg = window.require('merge-img');
->>>>>>> e383858790a52c1c3773bdb4e49a546388974583
+
 const fs = window.require('fs');
 const http = window.require('http');
 const https = window.require('https')
@@ -39,14 +36,13 @@ class Photo {
       img.write(path + '/outmap.jpg', () => console.log('done'));
     });
   }
-
-  static merge() {
+  static merge(photo1, photo2, outputPath) {
     const path = "./Photos/Flight29/";
-    mergeImg([path + "outmap1.jpg", path + "outmap.jpg"], {
+    mergeImg([photo1, photo2], {
       direction: true
     })
       .then((img) => {
-      img.write(path + '/outmap1.jpg', () => console.log('done'));
+      img.write(outputPath + '/outmap1.jpg', () => console.log('done'));
     });
   }
 
@@ -87,20 +83,6 @@ class Photo {
       });
   }
 
-<<<<<<< HEAD
-  static async getUrlBlurFactor(url) {
-    return await se
-      .check(["properties"])
-      .set_url(
-        "https://sightengine.com/assets/img/examples/example-prop-c1.jpg"
-      )
-      // .then(function(result) {
-      //   console.log("RESULT IMAGE :", result);
-      // })
-      // .catch(function(err) {
-      //   // Handle error
-      // });
-  }
 
   static getFileBlurFactor(filepath) {
     console.log("file blur");
@@ -112,7 +94,19 @@ class Photo {
       }).catch(function(err) {
         // Error
       });
-=======
+  }
+
+  // static getFileBlurFactor(filepath) {
+  //   console.log("file blur");
+  //   return  se
+  //     .check(['properties'])
+  //     .set_file(filepath)
+  //     .then(function(result) {
+  //       console.log('FILE BLUR :', result);
+  //     }).catch(function(err) {
+  //       // Error
+  //     });
+  // }
   // static async getUrlBlur(url) {
   //   return await sightengine
   //     .check(["properties"])
@@ -127,23 +121,16 @@ class Photo {
   //     });
   // }
 
-  static saveURL(url, ImgDir) {
-    FileSaver.saveAs(url, ImgDir);
-  }
-  static saveOBJ(file, ImgDir) {
-    var file = new File(file, ImgDir, { type: 'img' });
-    FileSaver.saveAs(file);
->>>>>>> e383858790a52c1c3773bdb4e49a546388974583
-  }
+  
 }
 
-Photo.merge();
+// Photo.merge();
 // Photo.blurUrl('https://images.unsplash.com/photo-1531804055935-76f44d7c3621?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80', "BlurKek.jpg");
 // Photo.blur("./Photos/Flight29/0.jpg", "./0.jpg", 20)
 // Photo.getFileBlurFactor('./0.jpg')
-Photo.getUrlBlurFactor().then(res => console.log("url sharpness: ", res.sharpness)); 
+// Photo.getUrlBlurFactor().then(res => console.log("url sharpness: ", res.sharpness)); 
 // Photo.getFileBlurFactor("./Photos/Flight29/0.jpg")
-console.log("sd");
+// console.log("sd");
 // Photo.getFileBlurFactor("0.jpg")
 
 // var binaryImage = fs.createReadStream(path.resolve(__dirname,'0.jpg'));

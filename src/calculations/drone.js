@@ -11,6 +11,8 @@ import {
 import { MainCalculation } from "../calculations/flyCalculations";
 import Photo from "../calculations/Photo";
 
+const fs = window.require('fs')
+
 class Drone {
   constructor(options, window) {
     for (let o of Object.entries(options)) {
@@ -143,6 +145,8 @@ class Drone {
   update() {
     if (!this.started) {
       this.started = true;
+      this.mapOffsetXStart = 0;
+      fs.closeSync(fs.openSync(this.folderPath + '/map.jpg', 'w'))
       this.startCallback();
     }
 
@@ -166,6 +170,7 @@ class Drone {
               vectorMapProxy(this.path[this.currentTargetIdx].position)
             )
           );
+          
 
           console.log(
             "val, label :",
@@ -206,7 +211,8 @@ class Drone {
           console.log("this.photos :", this.photos);
           this.ended = true;
 
-          Photo.mergeTwo(this.folderPath, "1.jpg", "2.jpg");
+          // Photo.mergeTwo(this.folderPath, "1.jpg", "2.jpg");
+          
           this.endCallback();
         }
       }

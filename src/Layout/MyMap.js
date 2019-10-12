@@ -186,7 +186,8 @@ class MyMap extends Component {
         // FIXME: not customizable at all
 
         let field = new Field({
-          polyArr
+          polyArr,
+          map
         });
         console.log("polyArr :", polyArr);
         this.setState({
@@ -398,10 +399,6 @@ class MyMap extends Component {
   }
 
   startFlight() {
-    // this.props.pushPhoto("photo");
-
-    // console.log('pushed :');
-    
     if (!fs.existsSync(folderPath)){
       fs.mkdirSync(folderPath);
     }
@@ -446,34 +443,6 @@ class MyMap extends Component {
         }
       }
     }
-
-    // let data = JSON.parse(MainCalculation({base, field, drone}));
-    // for(let p of data.PointsArr) {
-    //   let vp = new Vector(p.x, p.y);
-    //   this.state.drone.addToPath(this.state.drone.mapToCenter(vp));
-    //   let mark = new window.google.maps.Marker({
-    //     position: {
-    //       lat: p.x,
-    //       lng: p.y
-    //     },
-    //     map: this.state.map
-    //   });
-    // }
-
-    // console.log(data.PointsArr);
-    // console.log('target :', target);
-    //   let mark = new window.google.maps.Marker({
-    //     position: {
-    //       lat: target._x,
-    //       lng: target._y
-    //     },
-    //     map: this.state.map
-    //   });
-    // drone.addToPath(target);
-
-    // for(let i = 0; i < data.)
-    // this.state.drone.addToPath(this.state.drone.mapToCenter(target));
-
     this.update.call(that);
   }
 

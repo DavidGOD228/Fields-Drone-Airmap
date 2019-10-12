@@ -1,25 +1,8 @@
 import sightengine from "sightengine";
-// import mergeImg from "merge-img";
-// import Jimp from "jimp/es";
-
-// const fs = require("fs");
-// const http = require("http");
-// import http from "http";
-// import fs from "fs";
-// var app = require("remote").require("app");
-// var app = require("remote").require("app");
-
-// var file = fs.createWriteStream(app.getDataPath() + "externalFiles/file.jpg");
-// var request = http.get("http://url-to-api/some-image.jpg", function(response) {
-//   response.pipe(file);
-// });
 
 const mergeImg = window.require('merge-img');
-// import mergeImg from "merge-img"
-// console.log('mergeImg :', mergeImg);
-
+const jimp = window.require('jimp');
 const fs = window.require('fs');
-
 const http = window.require('http');
 const https = window.require('https')
 
@@ -68,11 +51,34 @@ class Photo {
     });
   }
 
-  blurBase64() {
-    // return Jimp.read(this.url, (err, lenna) => {
-    //   if (err) throw err;
-    //   lenna.blur(100).getBase64(Jimp.MIME_JPEG); // save
-    // });
+  // blurBase64(url) {
+  //   return Jimp.read(this.url, (err, lenna) => {
+  //     if (err) throw err;
+  //     lenna.blur(100).getBase64(Jimp.MIME_JPEG); // save
+  //   });
+  // }
+
+  // async static blur() {
+  static async blurUrl(url, outputFilepath, blurFactor = 20) {
+    // const image = await jimp.read 
+    const image = await jimp.read(url); 
+    console.log('image :', image);
+
+    image.blur(blurFactor, function(err){ 
+      if (err) throw err; 
+    }).write(outputFilepath);   
+  }
+
+  static blur(inputFilepath, outputFilepath, blurFactor = 20) {
+    // fs.readFile(inputFilepath, function(err, file) {
+    //   if (err) throw err; // Fail if the file can't be read.
+    
+    //   const image = URL.createObjectURL(new Blob([file], {type: "image/jpg"})); 
+
+    //   image.blur(blurFactor, function(err){ 
+    //     if (err) throw err; 
+    //   }).write(outputFilepath);   
+    // });    
   }
 
   // static async getUrlBlur(url) {
@@ -90,7 +96,9 @@ class Photo {
   // }
 }
 
-Photo.merge();
+// Photo.merge();
+Photo.blurUrl('https://images.unsplash.com/photo-1531804055935-76f44d7c3621?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80', "BlurKek.jpg");
+// Photo.blur("./Photos/Flight29/0.jpg", "./0.jpg", 20)
 
 // Photo.downloadUrl("ThIRD_PHOTO.jpg", "http://i3.ytimg.com/vi/J---aiyznGQ/mqdefault.jpg")
 

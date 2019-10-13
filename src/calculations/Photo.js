@@ -28,23 +28,7 @@ class Photo {
     this.url = url;
   }
 
-  static mergeTwo(path, name1, name2) {
-    const filename1 = path + "/" + name1, 
-          filename2 = path + "/" + name2;
-    mergeImg([filename1, filename2])
-      .then((img) => {
-      img.write(path + '/outmap.jpg', () => console.log('done'));
-    });
-  }
-  static merge(photo1, photo2, outputPath) {
-    const path = "./Photos/Flight29/";
-    mergeImg([photo1, photo2], {
-      direction: true
-    })
-      .then((img) => {
-      img.write(outputPath + '/outmap1.jpg', () => console.log('done'));
-    });
-  }
+  
 
   static downloadUrl(filename, url) { 
     const file = fs.createWriteStream(filename);
@@ -121,8 +105,48 @@ class Photo {
   //     });
   // }
 
-  
+  static mergeTwo(path, name1, name2) {
+    const filename1 = path + "/" + name1, 
+          filename2 = path + "/" + name2;
+    mergeImg([filename1, filename2])
+      .then((img) => {
+      img.write(path + '/outmap.jpg', () => console.log('done'));
+    });
+  }
+
+  static merge(photos, outputPath) {  
+    console.log('whatthefuck :');
+    mergeImg(photos, {
+      // direction: true,
+      // offset: 20
+      // margin: "40 100 0 10"
+      // color: 0x000FF000
+    })
+      .then((img) => {
+      img.write(outputPath, () => console.log('MERGE DONE'));
+    });
+  } 
 }
+
+Photo.merge([
+    {
+      src: "./Photos/Flight85/1.jpg",
+      // offsetX: 0,
+      // offsetY: 0
+    },
+    {
+      src: "./Photos/Flight85/30.jpg",
+      offsetX: 200,
+      offsetY: 400
+    },
+    // {
+    //   src: "./Photos/Flight85/5.jpg",
+    //   // offsetX: 100,
+    //   // offsetY: 100
+    // },
+  ], 
+  "./Photos/Flight85/outmap1.jpg"
+)
 
 // Photo.merge();
 // Photo.blurUrl('https://images.unsplash.com/photo-1531804055935-76f44d7c3621?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80', "BlurKek.jpg");

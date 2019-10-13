@@ -1,4 +1,5 @@
 import Vector from './Vector';
+import Rectangle from "./Rectangle";
 import {
   mapToVector,
   vectorToMap,
@@ -32,6 +33,7 @@ class Drone {
     this.currentTargetIdx = 0;
     this.currentTarget = this.path[this.currentTargetIdx] || null;
     this.finishedFlight = false;
+    this.photoBounds = Rectangle.newFromCenter(this.position, this.overlayRadiusLat, this.overlayRadiusLng);
 
     this.photos = [];
 
@@ -123,10 +125,12 @@ class Drone {
 
     settings.center = point.lat + ',' + point.lng;
     link = this.mashLink(base, settings);
-
     let filePath =
       this.folderPath + '/' + this.photos.length.toString().concat('.jpg');
-    Photo.downloadUrl(filePath, link);
+
+    if(this.savePhotos) {
+      Photo.downloadUrl(filePath, link);
+    }
 
     return link;
   }
@@ -147,7 +151,9 @@ class Drone {
     if (!this.started) {
       this.started = true;
       this.mapOffsetXStart = 0;
-      fs.closeSync(fs.openSync(this.folderPath + '/map.jpg', 'w'));
+      if(this.savePhotos) {
+        fs.closeSync(fs.openSync(this.folderPath + '/map.jpg', 'w'));
+      }
       this.startCallback();
     }
 
@@ -199,7 +205,9 @@ class Drone {
               east: this.position.lng + this.overlayRadiusLng,
               west: this.position.lng - this.overlayRadiusLng
             }
+            
           });
+
 
           this.coveredPath.push(coveredRect);
 
@@ -210,6 +218,26 @@ class Drone {
           this.finishedFlight = true;
           console.log('this.photos :', this.photos);
           this.ended = true;
+          Photo.merge([
+            {
+              src: "./Photos/Flight85/map.jpg",
+              // offsetX: 0,
+              // offsetY: 0
+            },
+            {
+              src: `./Photos/Flight85/${this.photos.length - 1}.jpg`,
+              // offsetX: 100,
+              // offsetY: 400
+            },
+            // {
+            //   src: "./Photos/Flight85/5.jpg",
+            //   // offsetX: 100,
+            //   // offsetY: 100
+            // },
+          ], 
+          "./Photos/Flight85/outmap1.jpg"
+        )
+        
 
           // Photo.mergeTwo(this.folderPath, "1.jpg", "2.jpg");
 

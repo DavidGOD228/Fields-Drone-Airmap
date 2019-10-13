@@ -1,10 +1,12 @@
 import Rectangle from "./Rectangle.js";
 import Vector from "./Vector.js";
-import { vectorMapProxy, vectorToMap } from "./helpers.js";
+import { vectorMapProxy, vectorToMap, getLngFactor } from "./helpers.js";
 
 class Field {
-  constructor({ polyArr, map }) {
+  constructor({ polyArr, map, drawSquares = false, drawBounds = false }) {
     console.log("polyARRRRR :", polyArr);
+    this.drawSquares = drawSquares;
+    this.drawBounds = drawBounds;
     this.polyArr = polyArr;
     this.map = map;
     let minX = polyArr.reduce((acc, cur) => {
@@ -20,6 +22,7 @@ class Field {
         return cur.lng > acc.lng ? cur : acc;
       }).lng;
 
+
     console.log("minX, maxX, minY, maxY :", minX, maxX, minY, maxY);
 
     let tl = vectorToMap(new Vector(minX, maxY)),
@@ -33,27 +36,29 @@ class Field {
     this.width = this.bounds.tr.lat - this.bounds.tl.lat;
     this.height = this.bounds.tr.lng - this.bounds.br.lng;
 
-    // this.rectBounds = new window.google.maps.Rectangle({
-    //   strokeColor: "#FF0000",
-    //   strokeOpacity: 0.8,
-    //   strokeWeight: 2,
-    //   fillColor: "#FF0000",
-    //   fillOpacity: 0.35,
-    //   map: this.map,
-    //   bounds: {
-    //     north: this.bounds.center.lat + this.bounds.xr,
-    //     south: this.bounds.center.lat - this.bounds.xr,
-    //     east:  this.bounds.center.lng + this.bounds.yr,
-    //     west:  this.bounds.center.lng - this.bounds.yr
-    //   }
-    // });
-    
+    if(this.drawBounds) {
+      this.rectBounds = new window.google.maps.Rectangle({
+        strokeColor: "#FF0000",
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: "#FF0000",
+        fillOpacity: 0.35,
+        map: this.map,
+        bounds: {
+          north: this.bounds.center.lat + this.bounds.xr,
+          south: this.bounds.center.lat - this.bounds.xr,
+          east:  this.bounds.center.lng + this.bounds.yr,
+          west:  this.bounds.center.lng - this.bounds.yr
+        }
+      });
+    }
   }
 
-  setSquareRadius(r) {
-    this.squareRadius = r;
+  setRadiuses(xr, yr) {
+    this.squareXr = xr;
+    this.squareYr = yr;
   }
-
+// TODO: check if any point square point is inside tl tr bl br
   isPointInside(p) {
     let vs = this.polyArr;
 
@@ -73,42 +78,75 @@ class Field {
     return inside;
   }
 
-  distributeOnSquares() {
-    let nWidth = Math.ceil(this.width / (this.squareRadius * 2)) ,
-      nHeight = Math.ceil(this.height / (this.squareRadius * 2));
+  isRectInside(rect, drawMakers = false) {
+    console.log('ISRECTINSDIE :');
+    let points = rect.toArray();
+    
+    let isInside = points.reduce((acc, cur) => {
+      if(drawMakers) {
+        let mark = new window.google.maps.Marker({
+          position: {
+            lat: cur.lat,
+            lng: cur.lng
+          },
+          map: this.map
+        });
+      }
+      return this.isPointInside(acc) || this.isPointInside(cur);
+    })
+    // console.log('points :', points, isInside, [this.isPointInside(points[0]), this.isPointInside(points[1]), this.isPointInside(points[2]), this.isPointInside(points[3])]);
 
-    this.squaresArray = Array.from({ length: nWidth }, (el, x) =>
+    console.log("INSIDE?: ", points.reduce((acc, cur) => {
+      return this.isPointInside(acc) || this.isPointInside(cur);
+    }))
+    return isInside;
+    
+    // return this.isPointInside(rect.center);
+  }
+
+  distributeOnSquares() {
+    let nLatSquares = Math.floor(this.width / (this.squareXr * 2)),
+        nLngSquares = Math.floor(this.height / (this.squareYr * 2))
+      // nLngSquares = Math.ceil(this.height / ((this.squareRadius * 2) / getLngFactor(nLatSquares)));
+
+    this.squaresArray = Array.from({ length: nLatSquares }, (el, x) =>
       Array.from(
         {
-          length: nHeight
+          length: nLngSquares
         },
         (ell, y) => {
-          let xr = (this.width / nWidth );
-          let yr = (this.height / nHeight);
-          let bounds = Rectangle.newFromCenter({
-                lat: this.bounds.tl.lat + (x / nWidth) * this.width,
-                lng: this.bounds.bl.lng + (y / nHeight) * this.height
-              }, xr, yr)
 
-          let coveredRect = new window.google.maps.Rectangle({
-            strokeColor: "#FFFF00",
-            strokeOpacity: 0.8,
-            strokeWeight: 2,
-            fillColor: "#00FF00",
-            fillOpacity: 0.35,
-            map: this.map,
-            bounds: {
-              north: bounds.center.lat + bounds.xr,
-              south: bounds.center.lat - bounds.xr,
-              east:  bounds.center.lng + bounds.yr,
-              west:  bounds.center.lng - bounds.yr
-            }
-          });
+          // let xr = (this.width / nLatSquares );
+          // let yr = (this.height / nLngSquares) ;
+          // let yr = xr;
+
+          // console.log('xr, yr :', xr, yr);
+          let bounds = Rectangle.newFromCenter({
+                lat: this.bounds.tl.lat + (x / nLatSquares) * this.width,
+                lng: this.bounds.bl.lng + (y / nLngSquares) * this.height
+              }, this.squareXr, this.squareYr)
+
+          if(this.drawSquares == true) {
+            let coveredRect = new window.google.maps.Rectangle({
+              strokeColor: "#FFFF00",
+              strokeOpacity: 0.8,
+              strokeWeight: 2,
+              fillColor: "#00FF00",
+              fillOpacity: 0.35,
+              map: this.map,
+              bounds: {
+                north: bounds.center.lat + bounds.xr + this.squareXr,
+                south: bounds.center.lat - bounds.xr + this.squareXr,
+                east:  bounds.center.lng + bounds.yr + this.squareYr,
+                west:  bounds.center.lng - bounds.yr + this.squareYr
+              }
+            });
+          }
 
           return {
             visited: false,
             bounds
-            // bounds: new Rectangle(this.bounds.tl.lat + ((x/nWidth) * this.width, this.bounds.tl.lng + ((y/nHeight) * this.height))
+            // bounds: new Rectangle(this.bounds.tl.lat + ((x/nLatSquares) * this.width, this.bounds.tl.lng + ((y/nLngSquares) * this.height))
           };
         }
       )

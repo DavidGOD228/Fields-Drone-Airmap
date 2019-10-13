@@ -59,3 +59,6 @@ export const getEnumDirection = angle => {
 export const getDirectionLabel = angle => {
   return numToDirection(getEnumDirection(angle));
 };
+
+// export const getLngFactor = (lat) => Math.cos(lat * 0.01745)
+export const getLngFactor = (lat) => Math.cos(lat * (Math.PI / 180))

@@ -1,4 +1,5 @@
-import Vector from "./Vector";
+import Vector from './Vector';
+import Rectangle from "./Rectangle";
 import {
   mapToVector,
   vectorToMap,
@@ -7,9 +8,11 @@ import {
   getEnumDirection,
   numToDirection,
   getDirectionLabel
-} from "./helpers";
-import { MainCalculation } from "../calculations/flyCalculations";
-import Photo from "../calculations/Photo";
+} from './helpers';
+import { MainCalculation } from '../calculations/flyCalculations';
+import Photo from '../calculations/Photo';
+
+const fs = window.require('fs');
 
 class Drone {
   constructor(options, window) {
@@ -30,6 +33,7 @@ class Drone {
     this.currentTargetIdx = 0;
     this.currentTarget = this.path[this.currentTargetIdx] || null;
     this.finishedFlight = false;
+    this.photoBounds = Rectangle.newFromCenter(this.position, this.overlayRadiusLat, this.overlayRadiusLng);
 
     this.photos = [];
 
@@ -39,10 +43,10 @@ class Drone {
     this.window = window;
     this.marker = new window.google.maps.Marker(options);
     this.fieldOverlay = new window.google.maps.Rectangle({
-      strokeColor: "#FF0000",
+      strokeColor: '#FF0000',
       strokeOpacity: 0.8,
       strokeWeight: 2,
-      fillColor: "#FF0000",
+      fillColor: '#FF0000',
       fillOpacity: 0.35,
       map: this.map,
       bounds: {
@@ -110,20 +114,23 @@ class Drone {
   makePhoto(
     point,
     settings = {
-      size: "400x400",
+      size: '400x400',
       zoom: 18,
-      maptype: "satellite",
-      key: "AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI"
+      maptype: 'satellite',
+      key: 'AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI'
     }
   ) {
-    const base = "https://maps.googleapis.com/maps/api/staticmap";
+    const base = 'https://maps.googleapis.com/maps/api/staticmap';
     let link;
 
-    settings.center = point.lat + "," + point.lng;
+    settings.center = point.lat + ',' + point.lng;
     link = this.mashLink(base, settings);
+    let filePath =
+      this.folderPath + '/' + this.photos.length.toString().concat('.jpg');
 
-    let filePath = this.folderPath + "/" + this.photos.length.toString().concat(".jpg");
-    Photo.downloadUrl(filePath, link);
+    if(this.savePhotos) {
+      Photo.downloadUrl(filePath, link);
+    }
 
     return link;
   }
@@ -133,8 +140,8 @@ class Drone {
     let res = base;
 
     for (let i = 0; i < ps.length; i++) {
-      res += i === 0 ? "?" : "&";
-      res += ps[i][0] + "=" + ps[i][1];
+      res += i === 0 ? '?' : '&';
+      res += ps[i][0] + '=' + ps[i][1];
     }
 
     return res;
@@ -143,6 +150,10 @@ class Drone {
   update() {
     if (!this.started) {
       this.started = true;
+      this.mapOffsetXStart = 0;
+      if(this.savePhotos) {
+        fs.closeSync(fs.openSync(this.folderPath + '/map.jpg', 'w'));
+      }
       this.startCallback();
     }
 
@@ -168,7 +179,7 @@ class Drone {
           );
 
           console.log(
-            "val, label :",
+            'val, label :',
             getEnumDirection(this.velocity.getAngleFull()),
             getDirectionLabel(this.velocity.getAngleFull())
           );
@@ -182,10 +193,10 @@ class Drone {
           // Photo.downloadUrl(photo.url, photo.url);
 
           let coveredRect = new window.google.maps.Rectangle({
-            strokeColor: "#FF0000",
+            strokeColor: '#FF0000',
             strokeOpacity: 0.8,
             strokeWeight: 0,
-            fillColor: "#FF0000",
+            fillColor: '#FF0000',
             fillOpacity: 0.35,
             map: this.map,
             bounds: {
@@ -194,7 +205,9 @@ class Drone {
               east: this.position.lng + this.overlayRadiusLng,
               west: this.position.lng - this.overlayRadiusLng
             }
+            
           });
+
 
           this.coveredPath.push(coveredRect);
 
@@ -203,10 +216,31 @@ class Drone {
         } else {
           this.velocity.setLength(0);
           this.finishedFlight = true;
-          console.log("this.photos :", this.photos);
+          console.log('this.photos :', this.photos);
           this.ended = true;
+          Photo.merge([
+            {
+              src: "./Photos/Flight85/map.jpg",
+              // offsetX: 0,
+              // offsetY: 0
+            },
+            {
+              src: `./Photos/Flight85/${this.photos.length - 1}.jpg`,
+              // offsetX: 100,
+              // offsetY: 400
+            },
+            // {
+            //   src: "./Photos/Flight85/5.jpg",
+            //   // offsetX: 100,
+            //   // offsetY: 100
+            // },
+          ], 
+          "./Photos/Flight85/outmap1.jpg"
+        )
+        
 
-          Photo.mergeTwo(this.folderPath, "1.jpg", "2.jpg");
+          // Photo.mergeTwo(this.folderPath, "1.jpg", "2.jpg");
+
           this.endCallback();
         }
       }
@@ -246,5 +280,3 @@ class Drone {
 }
 
 export default Drone;
-
-

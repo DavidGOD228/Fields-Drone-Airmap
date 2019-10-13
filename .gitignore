@@ -4,6 +4,7 @@
 /node_modules
 /Drone-win32-x64
 /DronePhotos
+/Photos
 package-lock.json
 
 # testing

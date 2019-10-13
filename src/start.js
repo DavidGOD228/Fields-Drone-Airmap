@@ -14,14 +14,13 @@ function createWindow() {
     if (err) throw err;
     console.log('Saved!');
   });
-  mainWindow = new BrowserWindow({ 
+  mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
       nodeIntegration: true
-    } 
+    }
   });
-
 
   mainWindow.loadURL(
     process.env.ELECTRON_START_URL ||

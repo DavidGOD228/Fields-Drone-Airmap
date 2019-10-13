@@ -14,17 +14,18 @@ import Vector from "../calculations/Vector";
 import Field from "../calculations/Field";
 import RectField from "../calculations/RectField";
 import { MainCalculation } from "../calculations/flyCalculations";
-import { mapToVector, vectorToMap } from "../calculations/helpers";
+import { mapToVector, vectorToMap, getLngFactor } from "../calculations/helpers";
 import { pushPhoto } from "../store/actions/photosGallery";
 import Photo from "../calculations/Photo";
 import { scrollDown } from "../components/helpers";
 
 const fs = window.require("fs");
+const savePhotos = false;
 let flightNumber, folderPath;
 
 fs.readFile("flight_number.txt", function(err, buf) {
   flightNumber = buf.toString();
-  folderPath= "./Photos/Flight" + flightNumber;
+  folderPath = "./Photos/Flight" + flightNumber;
   console.log("Flight number: ", buf.toString());
 });
 
@@ -33,6 +34,7 @@ class MyMap extends Component {
     super(props);
     this.state = {
       photos: [],
+      
 
       base: null,
       field: null,
@@ -186,7 +188,9 @@ class MyMap extends Component {
         // FIXME: not customizable at all
 
         let field = new Field({
-          polyArr
+          polyArr,
+          map,
+          // drawSquares: true
         });
         console.log("polyArr :", polyArr);
         this.setState({
@@ -275,25 +279,21 @@ class MyMap extends Component {
           window.google.maps.drawing.OverlayType.POLYGON
         );
 
-        // 0.0002 *
-        // ((Math.cos(marker.getPosition().lng()) * 40000) /
-        //   360 /
-        //   (40000 / 360))
         console.log("Drone :", Drone);
+
+        let droneMaxHeight = 0.0004;
+
         this.state.drone = new Drone(
           {
             position: pos,
             // speed: 0.00004,
             speed: 0.00002,
-            overlayRadiusLat: 0.0002,
-            overlayRadiusLng:
-              0.0002 /
-              ((Math.cos(marker.getPosition().lat()) * 40000) /
-                360 /
-                (40000 / 360)), //
+            overlayRadiusLat: droneMaxHeight / 2,
+            overlayRadiusLng: (droneMaxHeight / 2) / getLngFactor(marker.getPosition().lat()),
+              // 0.0002 / Math.cos(marker.getPosition().lat() * 0.01745),
             direction: Math.PI / 2,
 
-            maxHeight: 0.0001,
+            maxHeight: droneMaxHeight,
             focusDistance: 0.01,
             sensorA: 0.001,
             sensorB: 0.05,
@@ -302,6 +302,7 @@ class MyMap extends Component {
             photoCosts: 0,
             pushPhoto: this.props.pushPhoto,
             folderPath: folderPath,
+            savePhotos: savePhotos,
 
             startCallback: () => {
               this.state.scrollInterval = setInterval(() => {
@@ -398,16 +399,15 @@ class MyMap extends Component {
   }
 
   startFlight() {
-    // this.props.pushPhoto("photo");
-
-    // console.log('pushed :');
-    
-    if (!fs.existsSync(folderPath)){
-      fs.mkdirSync(folderPath);
+    if(savePhotos) {
+      if (!fs.existsSync(folderPath)) {
+        fs.mkdirSync(folderPath);
+      }
+  
+      fs.writeFile("flight_number.txt", parseInt(flightNumber) + 1, function() {
+        console.log("done");
+      });
     }
-
-    fs.writeFile('flight_number.txt', parseInt(flightNumber) + 1, function(){console.log('done')})
-
 
     let that = this;
     this.state.drone.setField(this.state.field);
@@ -416,10 +416,12 @@ class MyMap extends Component {
       this.state.drone.findClosestPoint(this.state.field.bounds.toArray())
     );
 
-    this.state.field.setSquareRadius(this.state.drone.overlayRadiusLng);
-    this.state.field.distributeOnSquares();
-
+    
     let { field, drone, base } = this.state;
+
+    field.setRadiuses(drone.overlayRadiusLat, drone.overlayRadiusLng);
+    field.distributeOnSquares();
+
     console.log("field :", field.squaresArray);
 
     for (let [it, p] of field.squaresArray.entries()) {
@@ -428,12 +430,15 @@ class MyMap extends Component {
       }
       for (let pp of p) {
         let vpp = drone.mapToCenter(mapToVector(pp.bounds.center));
-        console.log("vpp :", vectorToMap(vpp));
+        let rect = Rectangle.newFromCenter(vectorToMap(vpp), drone.overlayRadiusLat, drone.overlayRadiusLng)
+        console.log("vpp :", vectorToMap(vpp).lat == rect.center.lat, vectorToMap(vpp), rect.center);
         console.log(
           "field.isPointInside(vpp) :",
           field.isPointInside(vectorToMap(vpp))
         );
+
         if (field.isPointInside(vectorToMap(vpp))) {
+        // if (field.isRectInside(rect)) {
           drone.addToPath(vpp);
 
           let mark = new window.google.maps.Marker({
@@ -446,34 +451,6 @@ class MyMap extends Component {
         }
       }
     }
-
-    // let data = JSON.parse(MainCalculation({base, field, drone}));
-    // for(let p of data.PointsArr) {
-    //   let vp = new Vector(p.x, p.y);
-    //   this.state.drone.addToPath(this.state.drone.mapToCenter(vp));
-    //   let mark = new window.google.maps.Marker({
-    //     position: {
-    //       lat: p.x,
-    //       lng: p.y
-    //     },
-    //     map: this.state.map
-    //   });
-    // }
-
-    // console.log(data.PointsArr);
-    // console.log('target :', target);
-    //   let mark = new window.google.maps.Marker({
-    //     position: {
-    //       lat: target._x,
-    //       lng: target._y
-    //     },
-    //     map: this.state.map
-    //   });
-    // drone.addToPath(target);
-
-    // for(let i = 0; i < data.)
-    // this.state.drone.addToPath(this.state.drone.mapToCenter(target));
-
     this.update.call(that);
   }
 

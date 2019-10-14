@@ -56,10 +56,12 @@ class Drone {
         east: this.position.lng + this.overlayRadiusLng,
         west: this.position.lng - this.overlayRadiusLng
       }
+
     });
   }
 
   addToPath(v) {
+    // console.log(object);
     this.path.push({
       position: v.point,
       xn: v.xn,

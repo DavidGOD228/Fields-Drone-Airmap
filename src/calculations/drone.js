@@ -7,9 +7,11 @@ import {
   directionEnum,
   getEnumDirection,
   numToDirection,
-  getDirectionLabel
+  getDirectionLabel,
+  base64_encode
 } from './helpers';
 import { MainCalculation } from '../calculations/flyCalculations';
+
 import Photo from '../calculations/Photo';
 
 const fs = window.require('fs');
@@ -227,7 +229,27 @@ class Drone {
           this.ended = true;   
           console.log('this.mapPhotoObjs :', this.photoMapObjs);     
           // this.field.composeWithMap(photo)
-          this.field.composeMap(this.photoMapObjs);
+          // TODO: SET MAP PATH
+
+          // this.props.setMapPath(field.photosMap.path);
+          console.log('this.field.photoMap :', this.field);
+          this.field.composeMap(this.photoMapObjs).then(() => {
+            console.log('this.field.photoMap.path :', this.field.photosMap.path);
+            var base64str = base64_encode(this.field.photosMap.path);
+
+            // const base64path = fs.readFileSync(this.field.photosMap.path).toString('base64');
+            console.log('base64path :', base64str);
+            this.setMapPath(base64str);  
+          })
+
+          // (async () => {
+          //   await this.field.composeMap(this.photoMapObjs);
+            
+          //   const base64path = await fs.readFile(this.field.photosMap.path).toString('base64');
+          //   console.log('base64path :', base64path);
+          //   this.setMapPath(base64path);
+          // })();
+
           this.endCallback();
         }
       }

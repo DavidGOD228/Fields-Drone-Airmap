@@ -1,5 +1,7 @@
 import Vector from "./Vector";
 
+const fs = window.require('fs')
+
 export const mapToVector = mapCoords => {
   return new Vector(mapCoords.lat, mapCoords.lng);
 };
@@ -62,3 +64,13 @@ export const getDirectionLabel = angle => {
 
 // export const getLngFactor = (lat) => Math.cos(lat * 0.01745)
 export const getLngFactor = (lat) => Math.cos(lat * (Math.PI / 180))
+
+export const base64_encode = (file) => {
+  // read binary data
+  var bitmap = fs.readFileSync(file);
+  // convert binary data to base64 encoded string
+  console.log('bitmap :', bitmap);
+  let shit = new Buffer(bitmap).toString('base64');
+  console.log('shit :', shit);
+  return shit;
+}

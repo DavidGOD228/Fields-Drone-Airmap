@@ -15,7 +15,7 @@ import Field from "../calculations/Field";
 import RectField from "../calculations/RectField";
 import { MainCalculation } from "../calculations/flyCalculations";
 import { mapToVector, vectorToMap, getLngFactor } from "../calculations/helpers";
-import { pushPhoto } from "../store/actions/photosGallery";
+import { pushPhoto, setMapPath } from "../store/actions/photosGallery";
 import Photo from "../calculations/Photo";
 import { scrollDown } from "../components/helpers";
 
@@ -305,6 +305,7 @@ class MyMap extends Component {
             flightCosts: 0,
             photoCosts: 0,
             pushPhoto: this.props.pushPhoto,
+            setMapPath: this.props.setMapPath,
             folderPath: folderPath,
             savePhotos: savePhotos,
 
@@ -420,11 +421,19 @@ class MyMap extends Component {
       this.state.drone.findClosestPoint(this.state.field.bounds.toArray())
     );
 
+    
     let { field, drone, base } = this.state;
-
     field.setRadiuses(drone.overlayRadiusLat, drone.overlayRadiusLng);
     field.distributeOnSquares();
     await field.createMap();
+    this.state.drone.setField(field);
+    console.log('FIELD :', field);
+    
+    // MAP REDUX
+    // const logoPath = '/path/to/my/image.png';
+    
+    // const logo = fs.readFileSync(logoPath).toString('base64');
+    // this.props.setMapPath(field.photosMap.path);
     console.log('field.photosMap.mapImg :', field.photosMap.mapImg);
 
     console.log("field :", field.squaresArray);
@@ -527,13 +536,14 @@ class MyMap extends Component {
 
 let mapDispatchToProps = dispatch => {
   return {
-    pushPhoto: photo => dispatch(pushPhoto(photo))
+    pushPhoto: photo => dispatch(pushPhoto(photo)),
+    setMapPath: mapPath => dispatch(setMapPath(mapPath))
   };
 };
 
 let mapStateToProps = state => {
   return {
-    photos: state.photos
+    photos: state.photos,
   };
 };
 

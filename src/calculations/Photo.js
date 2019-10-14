@@ -172,7 +172,9 @@ class Photo {
     // let j = await Jimp.read("./Photos/Flight89/1.jpg");
     // console.log('canvas, j :', canvas, j);
     // canvas.composite(j, img.x, img.y);   
+    canvas.flip(false, true);
     canvas.write(outputPath, () => console.log('DONE COMPOSING'))
+
     return canvas;
   }
 }

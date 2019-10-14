@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { connect } from "react-redux";
+import { compose } from "redux";
 import { Link } from 'react-router-dom';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -14,6 +16,8 @@ import MyMap from './Layout/MyMap';
 import VariablesBlock from './VariablesBlock';
 
 import './index.css';
+
+const fs = window.require('fs');
 
 class App extends Component {
   constructor(props) {
@@ -112,6 +116,10 @@ class App extends Component {
                   }
                 ]}
               />
+
+              <div className="map-image">
+                <img src={this.props.mapPath} />
+              </div>
             </Sidebar>
           </div>
           <div className="flex-1 bg-gray-400 text-white">
@@ -126,4 +134,20 @@ class App extends Component {
   }
 }
 
-export default App;
+let mapDispatchToProps = dispatch => {
+  return {
+    // pushPhoto: photo => dispatch(pushPhoto(photo)),
+    // setMapPath: mapPath => dispatch(setMapPath(mapPath))
+  };
+};
+
+let mapStateToProps = state => {
+  return {
+    mapPath: state.mapPath,
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App);

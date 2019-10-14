@@ -123,14 +123,14 @@ class Field {
   async composeMap(images) {
     console.log('COMPOSE MAP :', images);
     this.photosMap.mapImg = await Photo.compositeImagesAndSave(this.photosMap, images, this.photosMap.path)
+    return new Promise((resolve) => resolve())
   }
 
   async createMap() {
     console.log('this.photosMap.nYPixels :', this.photosMap.nYPixels);
     console.log('this.photosMap.nXPixels :', this.photosMap.nXPixels);
     
-    this.photosMap.mapImg = await new Jimp(this.photosMap.nYPixels,
-      this.photosMap.nXPixels, 0x0);
+    this.photosMap.mapImg = await new Jimp(this.photosMap.nYPixels, this.photosMap.nXPixels, 0x0);
     this.photosMap.path = this.folderPath + "/output.jpg";
   }
 

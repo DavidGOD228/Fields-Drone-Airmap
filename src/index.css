@@ -11596,6 +11596,14 @@ video {
   background: #0000ff42;
 }
 
+.map-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* justify-items: center; */
+  height: 100vh;
+}
+
 @media (min-width: 640px) {
   .sm\:sr-only {
     position: absolute;

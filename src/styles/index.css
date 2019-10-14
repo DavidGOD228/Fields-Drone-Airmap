@@ -208,3 +208,11 @@
   background: -webkit-linear-gradient(to right, #1d2671, #c33764);
   background: #0000ff42;
 }
+
+.map-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* justify-items: center; */
+  height: 100vh;
+}

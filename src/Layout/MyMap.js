@@ -15,12 +15,12 @@ import Field from "../calculations/Field";
 import RectField from "../calculations/RectField";
 import { MainCalculation } from "../calculations/flyCalculations";
 import { mapToVector, vectorToMap, getLngFactor } from "../calculations/helpers";
-import { pushPhoto } from "../store/actions/photosGallery";
+import { pushPhoto, setMapPath } from "../store/actions/photosGallery";
 import Photo from "../calculations/Photo";
 import { scrollDown } from "../components/helpers";
 
 const fs = window.require("fs");
-const savePhotos = false;
+const savePhotos = true;
 let flightNumber, folderPath;
 
 fs.readFile("flight_number.txt", function(err, buf) {
@@ -34,7 +34,6 @@ class MyMap extends Component {
     super(props);
     this.state = {
       photos: [],
-      
 
       base: null,
       field: null,
@@ -190,7 +189,12 @@ class MyMap extends Component {
         let field = new Field({
           polyArr,
           map,
-          // drawSquares: true
+          dronePhotoDimentions: {
+            x: 400,
+            y: 400
+          },
+          folderPath: folderPath
+          // drawSquares: false
         });
         console.log("polyArr :", polyArr);
         this.setState({
@@ -301,6 +305,7 @@ class MyMap extends Component {
             flightCosts: 0,
             photoCosts: 0,
             pushPhoto: this.props.pushPhoto,
+            setMapPath: this.props.setMapPath,
             folderPath: folderPath,
             savePhotos: savePhotos,
 
@@ -398,7 +403,7 @@ class MyMap extends Component {
     // }
   }
 
-  startFlight() {
+  async startFlight() {
     if(savePhotos) {
       if (!fs.existsSync(folderPath)) {
         fs.mkdirSync(folderPath);
@@ -418,28 +423,41 @@ class MyMap extends Component {
 
     
     let { field, drone, base } = this.state;
-
     field.setRadiuses(drone.overlayRadiusLat, drone.overlayRadiusLng);
     field.distributeOnSquares();
+    await field.createMap();
+    this.state.drone.setField(field);
+    console.log('FIELD :', field);
+    
+    // MAP REDUX
+    // const logoPath = '/path/to/my/image.png';
+    
+    // const logo = fs.readFileSync(logoPath).toString('base64');
+    // this.props.setMapPath(field.photosMap.path);
+    console.log('field.photosMap.mapImg :', field.photosMap.mapImg);
 
     console.log("field :", field.squaresArray);
 
-    for (let [it, p] of field.squaresArray.entries()) {
-      if (it % 2 !== 0) {
+    for (let [y, p] of field.squaresArray.entries()) {
+      if (y % 2 !== 0) {
         p = p.reverse();
       }
-      for (let pp of p) {
+      for (let [x, pp] of p.entries()) {
         let vpp = drone.mapToCenter(mapToVector(pp.bounds.center));
         let rect = Rectangle.newFromCenter(vectorToMap(vpp), drone.overlayRadiusLat, drone.overlayRadiusLng)
-        console.log("vpp :", vectorToMap(vpp).lat == rect.center.lat, vectorToMap(vpp), rect.center);
-        console.log(
-          "field.isPointInside(vpp) :",
-          field.isPointInside(vectorToMap(vpp))
-        );
+        // console.log("vpp :", vectorToMap(vpp).lat == rect.center.lat, vectorToMap(vpp), rect.center);
+        // console.log(
+        //   "field.isPointInside(vpp) :",
+        //   field.isPointInside(vectorToMap(vpp))
+        // );
 
         if (field.isPointInside(vectorToMap(vpp))) {
         // if (field.isRectInside(rect)) {
-          drone.addToPath(vpp);
+          drone.addToPath({
+            point: vpp,
+            xn: x, 
+            yn: y
+          });
 
           let mark = new window.google.maps.Marker({
             position: {
@@ -518,13 +536,14 @@ class MyMap extends Component {
 
 let mapDispatchToProps = dispatch => {
   return {
-    pushPhoto: photo => dispatch(pushPhoto(photo))
+    pushPhoto: photo => dispatch(pushPhoto(photo)),
+    setMapPath: mapPath => dispatch(setMapPath(mapPath))
   };
 };
 
 let mapStateToProps = state => {
   return {
-    photos: state.photos
+    photos: state.photos,
   };
 };
 

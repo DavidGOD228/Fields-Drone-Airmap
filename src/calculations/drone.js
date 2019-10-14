@@ -7,9 +7,11 @@ import {
   directionEnum,
   getEnumDirection,
   numToDirection,
-  getDirectionLabel
+  getDirectionLabel,
+  base64_encode
 } from './helpers';
 import { MainCalculation } from '../calculations/flyCalculations';
+
 import Photo from '../calculations/Photo';
 
 const fs = window.require('fs');
@@ -25,8 +27,6 @@ class Drone {
 
     this.position = vectorMapProxy(mapToVector(this.position));
 
-    console.log('DRONE FLIGHT NUMBER :', this.flightNumber);
-
     this.targetMode = this.targetMode || false;
     this.path = this.path || [];
     this.coveredPath = [];
@@ -36,6 +36,7 @@ class Drone {
     this.photoBounds = Rectangle.newFromCenter(this.position, this.overlayRadiusLat, this.overlayRadiusLng);
 
     this.photos = [];
+    this.photoMapObjs = [];
 
     this.started = false;
     this.ended = false;
@@ -55,12 +56,16 @@ class Drone {
         east: this.position.lng + this.overlayRadiusLng,
         west: this.position.lng - this.overlayRadiusLng
       }
+
     });
   }
 
   addToPath(v) {
+    // console.log(object);
     this.path.push({
-      position: v,
+      position: v.point,
+      xn: v.xn,
+      yn: v.yn,
       reached: false
     });
   }
@@ -109,9 +114,7 @@ class Drone {
     }
   }
 
-  findPath() {}
-
-  makePhoto(
+  getPhotoLink(
     point,
     settings = {
       size: '400x400',
@@ -125,12 +128,12 @@ class Drone {
 
     settings.center = point.lat + ',' + point.lng;
     link = this.mashLink(base, settings);
-    let filePath =
-      this.folderPath + '/' + this.photos.length.toString().concat('.jpg');
+    // let filePath =
+    //   this.folderPath + '/' + this.photos.length.toString().concat('.jpg');
 
-    if(this.savePhotos) {
-      Photo.downloadUrl(filePath, link);
-    }
+    // if(this.savePhotos) {
+    //   Photo.downloadUrl(filePath, link);
+    // }
 
     return link;
   }
@@ -147,7 +150,7 @@ class Drone {
     return res;
   }
 
-  update() {
+  async update() {
     if (!this.started) {
       this.started = true;
       this.mapOffsetXStart = 0;
@@ -169,29 +172,39 @@ class Drone {
 
       if (d <= this.velocity.getLength()) {
         if (this.currentTargetIdx < this.path.length) {
+          // SET NEW STATE
           this.currentTarget.reached = true;
           this.path[this.currentTargetIdx].reached = true;
 
-          this.photos.push(
-            this.makePhoto(
-              vectorMapProxy(this.path[this.currentTargetIdx].position)
-            )
-          );
+          // MAKE A PHOTO
+          let photoLink = this.getPhotoLink(
+            // vectorMapProxy(this.path[this.currentTargetIdx].position)
+            vectorMapProxy(this.currentTarget.position)
+          )
+          this.photos.push(photoLink);
+          // SAVE FILE
+          let filePath =
+            this.folderPath + '/' + this.photos.length.toString().concat('.jpg');
+          if(this.savePhotos) {
+            Photo.downloadUrl(filePath, photoLink);
+          }
 
-          console.log(
-            'val, label :',
-            getEnumDirection(this.velocity.getAngleFull()),
-            getDirectionLabel(this.velocity.getAngleFull())
-          );
-
-          let droneDir = getEnumDirection(this.velocity.getAngleFull());
+          // let droneDir = getEnumDirection(this.velocity.getAngleFull());
           let photo = new Photo(
             { url: this.photos[this.photos.length - 1] },
-            { droneDir }
+            { 
+              x: this.currentTarget.xn * this.field.dronePhotoDimentions.x,
+              y: this.currentTarget.yn * this.field.dronePhotoDimentions.y,
+              src: filePath
+            }
           );
+          this.photoMapObjs.push(photo);
           this.pushPhoto(photo);
-          // Photo.downloadUrl(photo.url, photo.url);
-
+          
+          // COMPOSE PHOTO WITH MAP
+          // this.field.composeWithMap(photo)
+          // console.log('field.photosMap.mapImg :', this.field.photosMap.mapImg);
+          
           let coveredRect = new window.google.maps.Rectangle({
             strokeColor: '#FF0000',
             strokeOpacity: 0.8,
@@ -208,7 +221,6 @@ class Drone {
             
           });
 
-
           this.coveredPath.push(coveredRect);
 
           this.currentTargetIdx++;
@@ -216,30 +228,29 @@ class Drone {
         } else {
           this.velocity.setLength(0);
           this.finishedFlight = true;
-          console.log('this.photos :', this.photos);
-          this.ended = true;
-          Photo.merge([
-            {
-              src: "./Photos/Flight85/map.jpg",
-              // offsetX: 0,
-              // offsetY: 0
-            },
-            {
-              src: `./Photos/Flight85/${this.photos.length - 1}.jpg`,
-              // offsetX: 100,
-              // offsetY: 400
-            },
-            // {
-            //   src: "./Photos/Flight85/5.jpg",
-            //   // offsetX: 100,
-            //   // offsetY: 100
-            // },
-          ], 
-          "./Photos/Flight85/outmap1.jpg"
-        )
-        
+          this.ended = true;   
+          console.log('this.mapPhotoObjs :', this.photoMapObjs);     
+          // this.field.composeWithMap(photo)
+          // TODO: SET MAP PATH
 
-          // Photo.mergeTwo(this.folderPath, "1.jpg", "2.jpg");
+          // this.props.setMapPath(field.photosMap.path);
+          console.log('this.field.photoMap :', this.field);
+          this.field.composeMap(this.photoMapObjs).then(() => {
+            console.log('this.field.photoMap.path :', this.field.photosMap.path);
+            var base64str = base64_encode(this.field.photosMap.path);
+
+            // const base64path = fs.readFileSync(this.field.photosMap.path).toString('base64');
+            console.log('base64path :', base64str);
+            this.setMapPath(base64str);  
+          })
+
+          // (async () => {
+          //   await this.field.composeMap(this.photoMapObjs);
+            
+          //   const base64path = await fs.readFile(this.field.photosMap.path).toString('base64');
+          //   console.log('base64path :', base64path);
+          //   this.setMapPath(base64path);
+          // })();
 
           this.endCallback();
         }

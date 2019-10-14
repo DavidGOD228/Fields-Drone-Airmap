@@ -135,8 +135,8 @@ class Field {
   }
 
   distributeOnSquares() {
-    let nLatSquares = Math.floor(this.width / (this.squareXr * 2)),
-        nLngSquares = Math.floor(this.height / (this.squareYr * 2))
+    let nLatSquares = Math.floor(this.width / (this.squareXr * 1.9)),
+        nLngSquares = Math.floor(this.height / (this.squareYr * 1.9))
       // nLngSquares = Math.ceil(this.height / ((this.squareRadius * 2) / getLngFactor(nLatSquares)));
 
     this.photosMap.nXPixels = nLatSquares * this.dronePhotoDimentions.x;

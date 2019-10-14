@@ -189,10 +189,11 @@ class MyMap extends Component {
         let field = new Field({
           polyArr,
           map,
-          dronePhotoDimentions: {
-            x: 400,
-            y: 400
-          },
+          // dronePhotoDimentions: {
+          //   x: 420,
+          //   y: 420
+          // },
+          dronePhotoDimentions: this.state.drone.dronePhotoDimentions,
           folderPath: folderPath
           // drawSquares: false
         });
@@ -284,8 +285,8 @@ class MyMap extends Component {
         );
 
         console.log("Drone :", Drone);
-
-        let droneMaxHeight = 0.0004;
+        let droneDim = 420;
+        let droneMaxHeight = 0.0000005 * droneDim;
 
         this.state.drone = new Drone(
           {
@@ -298,16 +299,20 @@ class MyMap extends Component {
             direction: Math.PI / 2,
 
             maxHeight: droneMaxHeight,
-            focusDistance: 0.01,
-            sensorA: 0.001,
-            sensorB: 0.05,
-            charge: 10000000,
-            flightCosts: 0,
-            photoCosts: 0,
+            // focusDistance: 0.01,
+            // sensorA: 0.001,
+            // sensorB: 0.05,
+            // charge: 10000000,
+            // flightCosts: 0,
+            // photoCosts: 0,
             pushPhoto: this.props.pushPhoto,
             setMapPath: this.props.setMapPath,
             folderPath: folderPath,
             savePhotos: savePhotos,
+            dronePhotoDimentions: {
+              x: droneDim,
+              y: droneDim
+            },
 
             startCallback: () => {
               this.state.scrollInterval = setInterval(() => {

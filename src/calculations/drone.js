@@ -117,8 +117,9 @@ class Drone {
   getPhotoLink(
     point,
     settings = {
-      size: '400x400',
-      zoom: 18,
+      // size: '400x400',
+      size: `${this.dronePhotoDimentions.x}x${this.dronePhotoDimentions.y}`,
+      zoom: 20,
       maptype: 'satellite',
       key: 'AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI'
     }

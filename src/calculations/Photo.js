@@ -1,13 +1,15 @@
 import sightengine from "sightengine";
 
 const mergeImg = window.require('merge-img');
-const jimp = window.require('jimp');
+const mergeImages = window.require('merge-images')
+const Jimp = window.require('jimp');
 
 const fs = window.require('fs');
 const http = window.require('http');
-const https = window.require('https')
-const path = window.require('path')
+const https = window.require('https');
+const path = window.require('path');
 
+// console.log('mergeImages :', mergeImages);
 // console.log('mergeImg :', mergeImg);
 
 // downloadUrlToFile("Second_PHOTO.jpg", "http://i3.ytimg.com/vi/J---aiyznGQ/mqdefault.jpg");
@@ -46,8 +48,8 @@ class Photo {
 
   // async static blur() {
   static async blurUrl(url, outputFilepath, blurFactor = 20) {
-    // const image = await jimp.read 
-    const image = await jimp.read(url); 
+    // const image = await Jimp.read 
+    const image = await Jimp.read(url); 
     console.log('image :', image);
 
     image.blur(blurFactor, function(err){ 
@@ -56,7 +58,7 @@ class Photo {
   }
 
   static blur(inputFilepath, outputFilepath, blurFactor = 20) {
-    jimp.read(inputFilepath)
+    Jimp.read(inputFilepath)
       .then(file => {
         return file
           .blur(blurFactor)
@@ -105,50 +107,100 @@ class Photo {
   //     });
   // }
 
-  static mergeTwo(path, name1, name2) {
-    const filename1 = path + "/" + name1, 
-          filename2 = path + "/" + name2;
-    mergeImg([filename1, filename2])
-      .then((img) => {
-      img.write(path + '/outmap.jpg', () => console.log('done'));
-    });
+  // static async compositeImages(images, outputPath) {
+  //   var jimps = [];
+
+  //   for(let imgUrl of images) {
+  //     let j = await Jimp.read(imgUrl);
+  //     jimps.push(j);
+  //   }
+  //   console.log('jimps :', jimps);
+    
+  //   var mainImage = await new Jimp(1200, 1200, 0x0);
+
+  //   mainImage.composite(jimps[0], 0, 0);
+  //   mainImage.composite(jimps[1], 400, 400);
+  //   mainImage.composite(jimps[2], 800, 800);
+  //   mainImage.write(outputPath, () => console.log('DONE COMPOSING'))
+  // }
+
+  static async compositeImages(canvas, img) {
+    console.log("CALLED CI");
+    let j = await Jimp.read(img.src);
+    canvas.composite(j, img.x, img.y);    
+    return canvas;
   }
 
-  static merge(photos, outputPath) {  
-    console.log('whatthefuck :');
-    mergeImg(photos, {
-      // direction: true,
-      // offset: 20
-      // margin: "40 100 0 10"
-      // color: 0x000FF000
-    })
-      .then((img) => {
-      img.write(outputPath, () => console.log('MERGE DONE'));
-    });
-  } 
+  // static async compositeImagesAndSave(canvas, img, outputPath) {
+  //   console.log("CALLED CIAS");
+  //   // console.log('img.src :', img.src);
+  //   // let j = await Jimp.read(img.src);
+  //   console.log('img.src :', "./Photos/Flight89/1.jpg");
+  //   let j = await Jimp.read("./Photos/Flight89/1.jpg");
+  //   console.log('canvas, j :', canvas, j);
+  //   canvas.composite(j, img.x, img.y);    
+  //   canvas.write(outputPath, () => console.log('DONE COMPOSING'))
+  //   return canvas;
+  // }
+
+  static async compositeImagesAndSave(mainImg, imgs, outputPath) {
+    console.log("CALLED CIAS");
+    // console.log('img.src :', img.src);
+    // let j = await Jimp.read(img.src);
+    // console.log('img.src :', "./Photos/Flight89/1.jpg");
+    let canvas = mainImg.mapImg;
+    let jimps = [];
+
+    // canvas.contain(mainImg.nYPixels, mainImg.nXPixels, 0, Jimp.HORIZONTAL_ALIGN_LEFT | Jimp.VERTICAL_ALIGN_BOTTOM); 
+    // FIXME: -1 is not right
+    for(let i = 0; i < imgs.length - 1; i++) {
+      let j = await Jimp.read(imgs[i].src);
+      console.log('idx, j :',i, j);  
+      jimps.push(j)
+    }
+    // for(let [idx,img] of imgs.entries()) {
+    //   let j = await Jimp.read(img.src);
+    //   console.log('idx, j :',idx, j);
+    //   jimps.push(j)
+    // }
+
+    console.log('jimps, imgs :', jimps, imgs);
+    for(let [idx, j] of jimps.entries()) {
+      canvas.composite(j, imgs[idx].x, imgs[idx].y)
+    }
+
+    // let j = await Jimp.read("./Photos/Flight89/1.jpg");
+    // console.log('canvas, j :', canvas, j);
+    // canvas.composite(j, img.x, img.y);   
+    canvas.write(outputPath, () => console.log('DONE COMPOSING'))
+    return canvas;
+  }
 }
 
-Photo.merge([
-    {
-      src: "./Photos/Flight85/1.jpg",
-      // offsetX: 0,
-      // offsetY: 0
-    },
-    {
-      src: "./Photos/Flight85/30.jpg",
-      offsetX: 200,
-      offsetY: 400
-    },
-    // {
-    //   src: "./Photos/Flight85/5.jpg",
-    //   // offsetX: 100,
-    //   // offsetY: 100
-    // },
-  ], 
-  "./Photos/Flight85/outmap1.jpg"
-)
+// (async () => {
+//   let mapImg = await new Jimp(1200, 1200, 0x0);
+//   console.log('mapImg :', mapImg);
+//   mapImg = await Photo.compositeImagesAndSave(mapImg, {
+//     src: "./Photos/Flight89/1.jpg",
+//     x: 400,
+//     y: 400
+//   }, "./output.jpg")
+//   console.log('mapImg :', mapImg);
+// })();
 
-// Photo.merge();
+
+// Photo.compositeImages(
+//   [
+//     "./Photos/Flight85/1.jpg",
+//     "./Photos/Flight85/30.jpg",
+//     "./Photos/Flight85/31.jpg",
+//     // "./75.jpg",
+//     // "./76.jpg"
+//   ],
+//   // "./Photos/Flight85/output.jpg"
+//   "./output.jpg"
+// )
+
 // Photo.blurUrl('https://images.unsplash.com/photo-1531804055935-76f44d7c3621?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80', "BlurKek.jpg");
 // Photo.blur("./Photos/Flight29/0.jpg", "./0.jpg", 20)
 // Photo.getFileBlurFactor('./0.jpg')

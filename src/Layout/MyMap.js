@@ -20,7 +20,7 @@ import Photo from "../calculations/Photo";
 import { scrollDown } from "../components/helpers";
 
 const fs = window.require("fs");
-const savePhotos = false;
+const savePhotos = true;
 let flightNumber, folderPath;
 
 fs.readFile("flight_number.txt", function(err, buf) {
@@ -34,7 +34,6 @@ class MyMap extends Component {
     super(props);
     this.state = {
       photos: [],
-      
 
       base: null,
       field: null,
@@ -190,7 +189,12 @@ class MyMap extends Component {
         let field = new Field({
           polyArr,
           map,
-          // drawSquares: true
+          dronePhotoDimentions: {
+            x: 400,
+            y: 400
+          },
+          folderPath: folderPath
+          // drawSquares: false
         });
         console.log("polyArr :", polyArr);
         this.setState({
@@ -398,7 +402,7 @@ class MyMap extends Component {
     // }
   }
 
-  startFlight() {
+  async startFlight() {
     if(savePhotos) {
       if (!fs.existsSync(folderPath)) {
         fs.mkdirSync(folderPath);
@@ -416,30 +420,35 @@ class MyMap extends Component {
       this.state.drone.findClosestPoint(this.state.field.bounds.toArray())
     );
 
-    
     let { field, drone, base } = this.state;
 
     field.setRadiuses(drone.overlayRadiusLat, drone.overlayRadiusLng);
     field.distributeOnSquares();
+    await field.createMap();
+    console.log('field.photosMap.mapImg :', field.photosMap.mapImg);
 
     console.log("field :", field.squaresArray);
 
-    for (let [it, p] of field.squaresArray.entries()) {
-      if (it % 2 !== 0) {
+    for (let [y, p] of field.squaresArray.entries()) {
+      if (y % 2 !== 0) {
         p = p.reverse();
       }
-      for (let pp of p) {
+      for (let [x, pp] of p.entries()) {
         let vpp = drone.mapToCenter(mapToVector(pp.bounds.center));
         let rect = Rectangle.newFromCenter(vectorToMap(vpp), drone.overlayRadiusLat, drone.overlayRadiusLng)
-        console.log("vpp :", vectorToMap(vpp).lat == rect.center.lat, vectorToMap(vpp), rect.center);
-        console.log(
-          "field.isPointInside(vpp) :",
-          field.isPointInside(vectorToMap(vpp))
-        );
+        // console.log("vpp :", vectorToMap(vpp).lat == rect.center.lat, vectorToMap(vpp), rect.center);
+        // console.log(
+        //   "field.isPointInside(vpp) :",
+        //   field.isPointInside(vectorToMap(vpp))
+        // );
 
         if (field.isPointInside(vectorToMap(vpp))) {
         // if (field.isRectInside(rect)) {
-          drone.addToPath(vpp);
+          drone.addToPath({
+            point: vpp,
+            xn: x, 
+            yn: y
+          });
 
           let mark = new window.google.maps.Marker({
             position: {

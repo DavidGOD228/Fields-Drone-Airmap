@@ -1,29 +1,33 @@
 import Rectangle from "./Rectangle.js";
 import Vector from "./Vector.js";
 import { vectorMapProxy, vectorToMap, getLngFactor } from "./helpers.js";
+import Photo from "./Photo";
+
+const Jimp = window.require('jimp');
 
 class Field {
-  constructor({ polyArr, map, drawSquares = false, drawBounds = false }) {
-    console.log("polyARRRRR :", polyArr);
-    this.drawSquares = drawSquares;
-    this.drawBounds = drawBounds;
-    this.polyArr = polyArr;
-    this.map = map;
-    let minX = polyArr.reduce((acc, cur) => {
+  // constructor({ polyArr, map, drawSquares = false, drawBounds = false }) {
+  constructor(options) {
+    
+    for (let o of Object.entries(options)) {
+      this[o[0]] = o[1];
+    }
+    this.drawSquares = options.drawSquares || false;
+    this.drawBounds = options.drawBounds || false;
+    this.photosMap = {};
+    
+    let minX = this.polyArr.reduce((acc, cur) => {
         return cur.lat < acc.lat ? cur : acc;
       }).lat,
-      maxX = polyArr.reduce((acc, cur) => {
+      maxX = this.polyArr.reduce((acc, cur) => {
         return cur.lat > acc.lat ? cur : acc;
       }).lat,
-      minY = polyArr.reduce((acc, cur) => {
+      minY = this.polyArr.reduce((acc, cur) => {
         return cur.lng < acc.lng ? cur : acc;
       }).lng,
-      maxY = polyArr.reduce((acc, cur) => {
+      maxY = this.polyArr.reduce((acc, cur) => {
         return cur.lng > acc.lng ? cur : acc;
       }).lng;
-
-
-    console.log("minX, maxX, minY, maxY :", minX, maxX, minY, maxY);
 
     let tl = vectorToMap(new Vector(minX, maxY)),
       tr = vectorToMap(new Vector(maxX, maxY)),
@@ -104,10 +108,39 @@ class Field {
     // return this.isPointInside(rect.center);
   }
 
+  // (async () => {
+  //   let mapImg = await new Jimp(1200, 1200, 0x0);
+  //   mapImg = await Photo.compositeImagesAndSave(mapImg, {
+  //     src: "./Photos/Flight89/1.jpg",
+  //     x: 400,
+  //     y: 400
+  //   }, "./output.jpg")
+  // })();
+  async composeWithMap (img) {
+    this.photosMap.mapImg = await Photo.compositeImagesAndSave(this.photosMap.mapImg, img, this.photosMap.path)
+  }
+
+  async composeMap(images) {
+    console.log('COMPOSE MAP :', images);
+    this.photosMap.mapImg = await Photo.compositeImagesAndSave(this.photosMap, images, this.photosMap.path)
+  }
+
+  async createMap() {
+    console.log('this.photosMap.nYPixels :', this.photosMap.nYPixels);
+    console.log('this.photosMap.nXPixels :', this.photosMap.nXPixels);
+    
+    this.photosMap.mapImg = await new Jimp(this.photosMap.nYPixels,
+      this.photosMap.nXPixels, 0x0);
+    this.photosMap.path = this.folderPath + "/output.jpg";
+  }
+
   distributeOnSquares() {
     let nLatSquares = Math.floor(this.width / (this.squareXr * 2)),
         nLngSquares = Math.floor(this.height / (this.squareYr * 2))
       // nLngSquares = Math.ceil(this.height / ((this.squareRadius * 2) / getLngFactor(nLatSquares)));
+
+    this.photosMap.nXPixels = nLatSquares * this.dronePhotoDimentions.x;
+    this.photosMap.nYPixels = nLngSquares * this.dronePhotoDimentions.y;
 
     this.squaresArray = Array.from({ length: nLatSquares }, (el, x) =>
       Array.from(

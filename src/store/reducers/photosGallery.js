@@ -5,7 +5,7 @@ let initialState = {
 let photoReducer = (state = initialState, action) => {
   switch (action.type) {
     case "PUSH_PHOTO":
-      console.log({
+      console.log("PUSH_PHOTO", {
         ...state,
         photos: [...state.photos, action.photo],
       });
@@ -14,13 +14,13 @@ let photoReducer = (state = initialState, action) => {
         photos: [...state.photos, action.photo],
       };
     case "SET_MAP_PATH":
-      console.log({
+      console.log("SET_MAP_PATH", {
+        ...state,
         mapPath: action.mapPath,
-        ...state
       });
       return {
+        ...state,
         mapPath: action.mapPath,
-        ...state
       };
     default:
       return state;

@@ -38,6 +38,7 @@ class PhotosGallery extends Component {
     const files = event.target.files;
 
     for (let i = 0; i < files.length; i++) {
+      console.log('files[i] :', files[i]);
       this.props.pushPhoto(new Photo({ url: URL.createObjectURL(files[i]) }));
     }
     console.log("this.props.photos :", this.props.photos);

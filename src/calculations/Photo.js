@@ -155,7 +155,7 @@ class Photo {
     // FIXME: -1 is not right
     for(let i = 0; i < imgs.length - 1; i++) {
       let j = await Jimp.read(imgs[i].src);
-      console.log('idx, j :',i, j);  
+      // console.log('idx, j :',i, j);  
       jimps.push(j)
     }
     // for(let [idx,img] of imgs.entries()) {
@@ -164,7 +164,7 @@ class Photo {
     //   jimps.push(j)
     // }
 
-    console.log('jimps, imgs :', jimps, imgs);
+    // console.log('jimps, imgs :', jimps, imgs);
     for(let [idx, j] of jimps.entries()) {
       canvas.composite(j, imgs[idx].x, imgs[idx].y)
     }

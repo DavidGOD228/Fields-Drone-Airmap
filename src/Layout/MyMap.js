@@ -285,8 +285,12 @@ class MyMap extends Component {
         );
 
         console.log("Drone :", Drone);
-        let droneDim = 420;
-        let droneMaxHeight = 0.0000005 * droneDim;
+        let droneDim = 200;
+//         25.497646938259912 - 25.498987938259912
+// -0.0013410000000000366
+
+        let droneMaxHeight = 0.000005 * droneDim;
+        // let droneMaxHeight = 0.0013410000000000366 ;
 
         this.state.drone = new Drone(
           {

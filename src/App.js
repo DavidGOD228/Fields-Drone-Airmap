@@ -13,6 +13,7 @@ import {
 import Sidebar from './Layout/Sidebar';
 import PhotosGallery from './Layout/PhotosGallery';
 import MyMap from './Layout/MyMap';
+import CreatedMap from './Layout/CreatedMap';
 import VariablesBlock from './VariablesBlock';
 
 import './index.css';
@@ -45,6 +46,7 @@ class App extends Component {
   }
 
   render() {
+    console.log('this.props :', this.props);
     return (
       <BrowserRouter>
         <div className="min-h-screen md:flex">
@@ -78,6 +80,12 @@ class App extends Component {
                   className="menu-item flex flex-col justify-start items-center content-center text-center w-full bg-blue-700 py-2 cursor-pointer"
                 >
                   Photos
+                </Link>
+                <Link
+                  to="/created-map"
+                  className="menu-item flex flex-col justify-start items-center content-center text-center w-full bg-blue-700 py-2 cursor-pointer"
+                >
+                  Created map
                 </Link>
               </div>
 
@@ -117,15 +125,18 @@ class App extends Component {
                 ]}
               />
 
-              <div className="map-image">
-                <img src={this.props.mapPath} />
-              </div>
+              <Link to="/created-map">
+                <div>
+                  <img src={"data:image/png;base64," + this.props.mapPath} />
+                </div>
+              </Link>
             </Sidebar>
           </div>
           <div className="flex-1 bg-gray-400 text-white">
             <Switch>
               <Route exact path="/" component={PhotosGallery} />
               <Route exact path="/map" component={MyMap} />
+              <Route exact path="/created-map" component={CreatedMap} />
             </Switch>
           </div>
         </div>
@@ -142,8 +153,11 @@ let mapDispatchToProps = dispatch => {
 };
 
 let mapStateToProps = state => {
+  console.log('STATE :', state);
+  console.log('state.mapPath :', state.photos.mapPath);
   return {
-    mapPath: state.mapPath,
+    mapPath: state.photos.mapPath,
+    photos: state.photos
   };
 };
 

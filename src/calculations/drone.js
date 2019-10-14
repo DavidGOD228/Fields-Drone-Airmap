@@ -119,7 +119,7 @@ class Drone {
     settings = {
       // size: '400x400',
       size: `${this.dronePhotoDimentions.x}x${this.dronePhotoDimentions.y}`,
-      zoom: 20,
+      zoom: 19,
       maptype: 'satellite',
       key: 'AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI'
     }
@@ -235,15 +235,30 @@ class Drone {
           // TODO: SET MAP PATH
 
           // this.props.setMapPath(field.photosMap.path);
-          console.log('this.field.photoMap :', this.field);
-          this.field.composeMap(this.photoMapObjs).then(() => {
-            console.log('this.field.photoMap.path :', this.field.photosMap.path);
-            var base64str = base64_encode(this.field.photosMap.path);
 
-            // const base64path = fs.readFileSync(this.field.photosMap.path).toString('base64');
-            console.log('base64path :', base64str);
-            this.setMapPath(base64str);  
+
+          // console.log('this.field.photoMap :', this.field);
+          // this.field.composeMap(this.photoMapObjs).then(() => {
+          //   console.log('this.field.photoMap.path :', this.field.photosMap.path);
+          //   var base64str = base64_encode(this.field.photosMap.path);
+
+          //   // const base64path = fs.readFileSync(this.field.photosMap.path).toString('base64');
+          //   console.log('base64path :', base64str);
+          //   this.setMapPath(base64str);  
+          // })
+          this.field.composeMap(this.photoMapObjs).then(() => {
+            // setTimeout(() => {
+              console.log('this.field.photoMap.path :', this.field.photosMap.path);
+              fs.readFile(this.field.photosMap.path, (err, data) => {
+                console.log('data :', data);
+                console.log('data.toString("base64") :', data.toString('base64'));
+                let b64 = data.toString('base64')
+                this.setMapPath(b64);
+              });
+            // }, 3000);
           })
+
+
 
           // (async () => {
           //   await this.field.composeMap(this.photoMapObjs);

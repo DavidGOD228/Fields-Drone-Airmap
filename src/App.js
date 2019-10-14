@@ -45,6 +45,7 @@ class App extends Component {
   }
 
   render() {
+    console.log('this.props :', this.props);
     return (
       <BrowserRouter>
         <div className="min-h-screen md:flex">
@@ -118,7 +119,7 @@ class App extends Component {
               />
 
               <div className="map-image">
-                <img src={this.props.mapPath} />
+                <img src={"data:image/png;base64," + this.props.mapPath} />
               </div>
             </Sidebar>
           </div>
@@ -142,8 +143,11 @@ let mapDispatchToProps = dispatch => {
 };
 
 let mapStateToProps = state => {
+  console.log('STATE :', state);
+  console.log('state.mapPath :', state.photos.mapPath);
   return {
-    mapPath: state.mapPath,
+    mapPath: state.photos.mapPath,
+    photos: state.photos
   };
 };
 

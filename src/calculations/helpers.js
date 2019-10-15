@@ -14,16 +14,21 @@ export const vectorToMap = v => {
 };
 
 export const vectorMapProxy = v => {
-  Object.defineProperty(v, "lat", {
-    get: function() {
-      return this.getX();
-    }
-  });
-  Object.defineProperty(v, "lng", {
-    get: function() {
-      return this.getY();
-    }
-  });
+  if (typeof v.lat === "undefined") {
+    Object.defineProperty(v, "lat", {
+      get: function() {
+        return this.getX();
+      }
+    });
+  }
+
+  if (typeof v.lng === "undefined") {
+    Object.defineProperty(v, "lng", {
+      get: function() {
+        return this.getY();
+      }
+    });
+  }
   return v;
 };
 

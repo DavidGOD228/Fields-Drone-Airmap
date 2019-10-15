@@ -430,6 +430,7 @@ class MyMap extends Component {
       this.state.drone.findClosestPoint(this.state.field.bounds.toArray())
     );
 
+    // MainCalculation()
     
     let { field, drone, base } = this.state;
     field.setRadiuses(drone.overlayRadiusLat, drone.overlayRadiusLng);
@@ -446,6 +447,8 @@ class MyMap extends Component {
     console.log('field.photosMap.mapImg :', field.photosMap.mapImg);
 
     console.log("field :", field.squaresArray);
+    const composedPath = [];
+    let composedPathBack;
 
     for (let [y, p] of field.squaresArray.entries()) {
       if (y % 2 !== 0) {
@@ -462,11 +465,12 @@ class MyMap extends Component {
 
         if (field.isPointInside(vectorToMap(vpp))) {
         // if (field.isRectInside(rect)) {
-          drone.addToPath({
+          let pathNode = {
             point: vpp,
             xn: x, 
             yn: y
-          });
+          };
+          composedPath.push(pathNode);
 
           let mark = new window.google.maps.Marker({
             position: {
@@ -478,6 +482,16 @@ class MyMap extends Component {
         }
       }
     }
+
+    // drone.addToPath(pathNode);
+    composedPathBack = [...composedPath].reverse();
+    // console.log(composedPath);
+    // console.log(composedPathBack);
+    drone.addComposedPath(composedPath)
+    drone.addComposedPath(composedPathBack)
+    drone.distributeComposedPaths();
+    console.log('drone.path :', drone.path);
+
     this.update.call(that);
   }
 
@@ -523,7 +537,7 @@ class MyMap extends Component {
               <div
                 className={`appear-anim photo-gallery-item  ${this.state
                   .expandedIdx === idx && "photo-gallery-item-expanded"}`}
-                key={f.url}
+                key={f.url + Math.random() * Math.random()}
               >
                 <div
                   className="photo-expand-button icon-wrapper click-scale-down text-white"

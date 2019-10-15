@@ -46,7 +46,7 @@ class App extends Component {
   }
 
   render() {
-    console.log('this.props :', this.props);
+    // console.log('this.props :', this.props);
     return (
       <BrowserRouter>
         <div className="min-h-screen md:flex">
@@ -153,8 +153,8 @@ let mapDispatchToProps = dispatch => {
 };
 
 let mapStateToProps = state => {
-  console.log('STATE :', state);
-  console.log('state.mapPath :', state.photos.mapPath);
+  // console.log('STATE :', state);
+  // console.log('state.mapPath :', state.photos.mapPath);
   return {
     mapPath: state.photos.mapPath,
     photos: state.photos

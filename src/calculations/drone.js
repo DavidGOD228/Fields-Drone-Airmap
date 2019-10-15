@@ -1,5 +1,5 @@
 import Vector from './Vector';
-import Rectangle from "./Rectangle";
+import Rectangle from './Rectangle';
 import {
   mapToVector,
   vectorToMap,
@@ -33,7 +33,11 @@ class Drone {
     this.currentTargetIdx = 0;
     this.currentTarget = this.path[this.currentTargetIdx] || null;
     this.finishedFlight = false;
-    this.photoBounds = Rectangle.newFromCenter(this.position, this.overlayRadiusLat, this.overlayRadiusLng);
+    this.photoBounds = Rectangle.newFromCenter(
+      this.position,
+      this.overlayRadiusLat,
+      this.overlayRadiusLng
+    );
 
     this.photos = [];
     this.photoMapObjs = [];
@@ -56,7 +60,6 @@ class Drone {
         east: this.position.lng + this.overlayRadiusLng,
         west: this.position.lng - this.overlayRadiusLng
       }
-
     });
   }
 
@@ -118,8 +121,9 @@ class Drone {
     point,
     settings = {
       // size: '400x400',
-      size: `${this.dronePhotoDimentions.x}x${this.dronePhotoDimentions.y}`,
-      zoom: 19,
+      size: `${this.dronePhotoDimentions.x + 13}x${this.dronePhotoDimentions.y +
+        12}`,
+      zoom: 17,
       maptype: 'satellite',
       key: 'AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI'
     }
@@ -155,7 +159,7 @@ class Drone {
     if (!this.started) {
       this.started = true;
       this.mapOffsetXStart = 0;
-      if(this.savePhotos) {
+      if (this.savePhotos) {
         fs.closeSync(fs.openSync(this.folderPath + '/map.jpg', 'w'));
       }
       this.startCallback();
@@ -181,19 +185,21 @@ class Drone {
           let photoLink = this.getPhotoLink(
             // vectorMapProxy(this.path[this.currentTargetIdx].position)
             vectorMapProxy(this.currentTarget.position)
-          )
+          );
           this.photos.push(photoLink);
           // SAVE FILE
           let filePath =
-            this.folderPath + '/' + this.photos.length.toString().concat('.jpg');
-          if(this.savePhotos) {
+            this.folderPath +
+            '/' +
+            this.photos.length.toString().concat('.jpg');
+          if (this.savePhotos) {
             Photo.downloadUrl(filePath, photoLink);
           }
 
           // let droneDir = getEnumDirection(this.velocity.getAngleFull());
           let photo = new Photo(
             { url: this.photos[this.photos.length - 1] },
-            { 
+            {
               x: this.currentTarget.xn * this.field.dronePhotoDimentions.x,
               y: this.currentTarget.yn * this.field.dronePhotoDimentions.y,
               src: filePath
@@ -201,11 +207,11 @@ class Drone {
           );
           this.photoMapObjs.push(photo);
           this.pushPhoto(photo);
-          
+
           // COMPOSE PHOTO WITH MAP
           // this.field.composeWithMap(photo)
           // console.log('field.photosMap.mapImg :', this.field.photosMap.mapImg);
-          
+
           let coveredRect = new window.google.maps.Rectangle({
             strokeColor: '#FF0000',
             strokeOpacity: 0.8,
@@ -219,7 +225,6 @@ class Drone {
               east: this.position.lng + this.overlayRadiusLng,
               west: this.position.lng - this.overlayRadiusLng
             }
-            
           });
 
           this.coveredPath.push(coveredRect);
@@ -229,13 +234,12 @@ class Drone {
         } else {
           this.velocity.setLength(0);
           this.finishedFlight = true;
-          this.ended = true;   
-          console.log('this.mapPhotoObjs :', this.photoMapObjs);     
+          this.ended = true;
+          console.log('this.mapPhotoObjs :', this.photoMapObjs);
           // this.field.composeWithMap(photo)
           // TODO: SET MAP PATH
 
           // this.props.setMapPath(field.photosMap.path);
-
 
           // console.log('this.field.photoMap :', this.field);
           // this.field.composeMap(this.photoMapObjs).then(() => {
@@ -244,25 +248,26 @@ class Drone {
 
           //   // const base64path = fs.readFileSync(this.field.photosMap.path).toString('base64');
           //   console.log('base64path :', base64str);
-          //   this.setMapPath(base64str);  
+          //   this.setMapPath(base64str);
           // })
           this.field.composeMap(this.photoMapObjs).then(() => {
             // setTimeout(() => {
-              console.log('this.field.photoMap.path :', this.field.photosMap.path);
-              fs.readFile(this.field.photosMap.path, (err, data) => {
-                console.log('data :', data);
-                console.log('data.toString("base64") :', data.toString('base64'));
-                let b64 = data.toString('base64')
-                this.setMapPath(b64);
-              });
+            console.log(
+              'this.field.photoMap.path :',
+              this.field.photosMap.path
+            );
+            fs.readFile(this.field.photosMap.path, (err, data) => {
+              console.log('data :', data);
+              console.log('data.toString("base64") :', data.toString('base64'));
+              let b64 = data.toString('base64');
+              this.setMapPath(b64);
+            });
             // }, 3000);
-          })
-
-
+          });
 
           // (async () => {
           //   await this.field.composeMap(this.photoMapObjs);
-            
+
           //   const base64path = await fs.readFile(this.field.photosMap.path).toString('base64');
           //   console.log('base64path :', base64path);
           //   this.setMapPath(base64path);

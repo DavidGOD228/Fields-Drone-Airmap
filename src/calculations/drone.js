@@ -121,9 +121,8 @@ class Drone {
     point,
     settings = {
       // size: '400x400',
-      size: `${this.dronePhotoDimentions.x + 13}x${this.dronePhotoDimentions.y +
-        12}`,
-      zoom: 17,
+      size: `${this.dronePhotoDimentions.x + 2}x${this.dronePhotoDimentions.y}`,
+      zoom: 18,
       maptype: 'satellite',
       key: 'AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI'
     }

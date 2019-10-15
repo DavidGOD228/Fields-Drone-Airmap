@@ -1,13 +1,14 @@
 import sightengine from 'sightengine';
-
 const mergeImg = window.require('merge-img');
 const mergeImages = window.require('merge-images');
+
 const Jimp = window.require('jimp');
 
 const fs = window.require('fs');
 const http = window.require('http');
 const https = window.require('https');
 const path = window.require('path');
+import Rembrandt from 'rembrandt';
 
 // console.log('mergeImages :', mergeImages);
 // console.log('mergeImg :', mergeImg);
@@ -68,41 +69,73 @@ class Photo {
 
   static getFileBlurFactor(filepath) {
     console.log('file blur');
-    return se
-      .check(['properties'])
-      .set_file(filepath)
+    var i64 = new Buffer(fs.readFileSync(filepath)).toString('base64');
+
+    var Result;
+    sightengine
+      .check(['type', 'properties'])
+      .set_bytes(i64, 'image.png')
       .then(function(result) {
-        console.log('FILE BLUR :', result);
+        Result = result;
+        console.log('file blur detecter');
       })
       .catch(function(err) {
-        // Error
+        console.log('file blur detect ERROR ', err);
+      });
+
+    return Result;
+  }
+  static async getUrlBlur(url) {
+    return await sightengine
+      .check(['properties'])
+      .set_url(url)
+      .then(function(result) {
+        console.log('RESULT IMAGE :', result);
+      })
+      .catch(function(err) {
+        // Handl e error
       });
   }
 
-  // static getFileBlurFactor(filepath) {
-  //   console.log("file blur");
-  //   return  se
-  //     .check(['properties'])
-  //     .set_file(filepath)
-  //     .then(function(result) {
-  //       console.log('FILE BLUR :', result);
-  //     }).catch(function(err) {
-  //       // Error
-  //     });
-  // }
-  // static async getUrlBlur(url) {
-  //   return await sightengine
-  //     .check(["properties"])
-  //     .set_url(
-  //       "https://sightengine.com/assets/img/examples/example-prop-c1.jpg"
-  //     )
-  //     .then(function(result) {
-  //       console.log("RESULT IMAGE :", result);
-  //     })
-  //     .catch(function(err) {
-  //       // Handl e error
-  //     });
-  // }
+  static getDiff(image1, image2) {
+    const rembrandt = new Rembrandt({
+      // `imageA` and `imageB` can be either Strings (file path on node.js,
+      // public url on Browsers) or Buffers
+      imageA: image1,
+      imageB: image2,
+
+      // Needs to be one of Rembrandt.THRESHOLD_PERCENT or Rembrandt.THRESHOLD_PIXELS
+      thresholdType: Rembrandt.THRESHOLD_PERCENT,
+
+      // The maximum threshold (0...1 for THRESHOLD_PERCENT, pixel count for THRESHOLD_PIXELS
+      maxThreshold: 0.01,
+
+      // Maximum color delta (0...255):
+      maxDelta: 20,
+
+      // Maximum surrounding pixel offset
+      maxOffset: 0,
+
+      renderComposition: true, // Should Rembrandt render a composition image?
+      compositionMaskColor: Rembrandt.Color.RED // Color of unmatched pixels
+    });
+
+    // Run the comparison
+    var difference;
+    rembrandt
+      .compare()
+      .then(function(result) {
+        console.log('Passed:', result.passed);
+        console.log('Percentage Difference', result.percentageDifference, '%');
+        console.log('Composition image buffer:', result.compositionImage);
+
+        // Note that `compositionImage` is an Image when Rembrandt.js is run in the browser environment
+      })
+      .catch(e => {
+        console.error(e);
+      });
+    return difference;
+  }
 
   // static async compositeImages(images, outputPath) {
   //   var jimps = [];
@@ -180,10 +213,14 @@ class Photo {
     // console.log('canvas, j :', canvas, j);
     // canvas.composite(j, img.x, img.y);
 
+    // this.getDiff(
+    //   'C:/Users/dtrum/Desktop/c83b33ca-b9ff-49ea-834b-28432a0b6dc2.jpg',
+    //   'C:/Users/dtrum/Desktop/c83b33ca-b9ff-49ea-834b-28432a0b6dc2.jpg'
+    // );
     //this.inverceColor(canvas);
 
     canvas.write(outputPath, () => console.log('DONE COMPOSING'));
-
+    console.log(this.getFileBlurFactor('C:/Users/dtrum/Desktop/image.png'));
     return canvas;
   }
 }

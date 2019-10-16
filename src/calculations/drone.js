@@ -34,6 +34,7 @@ class Drone {
     this.coveredPath = [];
     this.currentTargetIdx = 0;
     this.currentSubflightIdx = 0;
+    this.relativeCounter = 0;
     this.currentTarget = this.path[this.currentTargetIdx] || null;
     this.finishedFlight = false;
     this.photoBounds = Rectangle.newFromCenter(
@@ -175,6 +176,10 @@ class Drone {
         fs.closeSync(fs.openSync(this.folderPath + '/map.jpg', 'w'));
       }
       // this.distributeComposedPaths();
+      this.fullFolderPath = `${this.folderPath}/Subflight1`;
+      if (!fs.existsSync(this.fullFolderPath)) {
+        fs.mkdirSync(this.fullFolderPath);
+      }
       console.log('this.path :', this.path);
       this.startCallback();
     }
@@ -195,6 +200,14 @@ class Drone {
           this.currentTarget.reached = true;
           this.path[this.currentTargetIdx].reached = true;
 
+          if(this.currentSubflightIdx === 0 && this.currentTargetIdx > this.composedPaths[0].length) {
+            this.fullFolderPath = this.folderPath + "/Subflight2";
+            this.relativeCounter = 0;
+            this.currentSubflightIdx++;
+            if (!fs.existsSync(this.fullFolderPath)) {
+              fs.mkdirSync(this.fullFolderPath);
+            }
+          }
           // MAKE A PHOTO
           console.log('this.currentTarget.position :', this.currentTarget.position);
           let photoLink = this.getPhotoLink(
@@ -204,9 +217,9 @@ class Drone {
           this.photos.push(photoLink);
           // SAVE FILE
           let filePath =
-            this.folderPath +
+            this.fullFolderPath +
             '/' +
-            this.photos.length.toString().concat('.jpg');
+            this.relativeCounter.toString().concat('.jpg');
           if (this.savePhotos) {
             Photo.downloadUrl(filePath, photoLink);
           }
@@ -241,6 +254,9 @@ class Drone {
           this.coveredPath.push(coveredRect);
 
           this.currentTargetIdx++;
+          console.log(this.relativeCounter);
+          this.relativeCounter++;
+          console.log(this.relativeCounter);
           this.currentTarget = this.path[this.currentTargetIdx] || null;
         } else {
           this.velocity.setLength(0);

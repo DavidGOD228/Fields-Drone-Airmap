@@ -449,6 +449,7 @@ class MyMap extends Component {
     console.log("field :", field.squaresArray);
     const composedPath = [];
     let composedPathBack;
+    
 
     for (let [y, p] of field.squaresArray.entries()) {
       if (y % 2 !== 0) {
@@ -470,6 +471,7 @@ class MyMap extends Component {
             xn: x, 
             yn: y
           };
+          // drone.addToPath(pathNode);
           composedPath.push(pathNode);
 
           let mark = new window.google.maps.Marker({
@@ -483,10 +485,7 @@ class MyMap extends Component {
       }
     }
 
-    // drone.addToPath(pathNode);
     composedPathBack = [...composedPath].reverse();
-    // console.log(composedPath);
-    // console.log(composedPathBack);
     drone.addComposedPath(composedPath)
     drone.addComposedPath(composedPathBack)
     drone.distributeComposedPaths();

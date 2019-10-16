@@ -14,6 +14,7 @@ import Sidebar from './Layout/Sidebar';
 import PhotosGallery from './Layout/PhotosGallery';
 import MyMap from './Layout/MyMap';
 import CreatedMap from './Layout/CreatedMap';
+import Settings from './Layout/Settings';
 import VariablesBlock from './VariablesBlock';
 
 import './index.css';
@@ -87,6 +88,12 @@ class App extends Component {
                 >
                   Created map
                 </Link>
+                <Link
+                  to="/settings"
+                  className="menu-item flex flex-col justify-start items-center content-center text-center w-full bg-blue-700 py-2 cursor-pointer"
+                >
+                  Settings
+                </Link>
               </div>
 
               <div
@@ -137,6 +144,7 @@ class App extends Component {
               <Route exact path="/" component={PhotosGallery} />
               <Route exact path="/map" component={MyMap} />
               <Route exact path="/created-map" component={CreatedMap} />
+              <Route exact path="/settings" component={Settings} />
             </Switch>
           </div>
         </div>

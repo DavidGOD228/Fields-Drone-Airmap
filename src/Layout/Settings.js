@@ -3,10 +3,17 @@ import { connect } from "react-redux";
 import { compose } from "redux";
 import { withRouter } from "react-router-dom";
 
+
 import { setSettingState } from "../store/actions/photosGallery";
+
 
 class Settings extends Component {
   
+
+  constructor(props) {
+    super(props);
+  }
+
   toggleChange(setting) {
     this.props.setSettingState(setting);
     console.log("setting", setting);
@@ -18,10 +25,11 @@ class Settings extends Component {
 
   render() {
     const { settings } = this.props;
+    const languageSettingVal = settings.find(el => el.label === "Language").value;
     
     return (
       <div className="container mx-auto  flex flex-col	 justify-center items-center">
-        <h1 className="text-6xl text-center font-hairline">Settings</h1>
+        <h1 className="text-6xl text-center font-hairline">{languageSettingVal === "English" ? "Settings" : "Налаштування"}</h1>
         {/* <div className="container"> */}
         <ul className="container  my-10 px-64">
           {settings.map((setting, i) => {
@@ -48,7 +56,7 @@ class Settings extends Component {
                 );
               case "select":
                 return (
-                  <div>Select</div>
+                  <div>shit</div>
                 );
               default:
                 break;

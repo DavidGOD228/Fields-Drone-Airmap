@@ -10,7 +10,7 @@
   # task 4 
   [x] 
   # task 5 
-  [stas] є постідовність фото отримана в два проходи над тією є   територією. 
+  [stas] є постідовність фото отримана в два проходи над тією є територією. 
   [DAVID] Відмітити зміни в ситуації: нові обєкти відсутні обєкти
   # task 6 
   [x]
@@ -18,7 +18,7 @@
   # ADDITIONAL & BUGS
   [stas] fix a bug with making the last photo
   [stas] fix a bug with a program working only in top right quarter 
-[STAS] MAKE SETTINGS VIEW
+  [x] MAKE SETTINGS VIEW
   [stas] make switching language
   [DAVID] fix a bug with shifting photos in the map
   [DAVID] fix a bug with empty spaces between photos in the map

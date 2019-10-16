@@ -2,7 +2,7 @@ let initialState = {
   settings: [
     {
       label: "Language",
-      value: "English",
+      value: "Ukrainian",
       type: "select",
     },
     {

@@ -30,8 +30,12 @@ fs.readFile("flight_number.txt", function(err, buf) {
 });
 
 class MyMap extends Component {
+
   constructor(props) {
     super(props);
+    const { settings } = this.props;
+    const languageSettingVal = settings.find(el => el.label === "Language").value;
+
     this.state = {
       photos: [],
 
@@ -41,7 +45,7 @@ class MyMap extends Component {
       readyForStart: false,
 
       currentLabelIdx: 0,
-      labels: ["Set the base", "Set the field"],
+      labels: languageSettingVal === "English" ? ["Set the base", "Set the field"] : ["Встановіть базу", "Встановіть поле"],
 
       map: null,
       drawingManager: null,
@@ -564,8 +568,10 @@ let mapDispatchToProps = dispatch => {
 };
 
 let mapStateToProps = state => {
+  // console.log('SHIT STATE :', state);
   return {
     photos: state.photos,
+    settings: state.settings.settings
   };
 };
 

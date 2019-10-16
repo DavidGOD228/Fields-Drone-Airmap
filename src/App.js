@@ -48,6 +48,9 @@ class App extends Component {
 
   render() {
     // console.log('this.props :', this.props);
+
+    const { settings } = this.props;
+    const languageSettingVal = settings.find(el => el.label === "Language").value;
     return (
       <BrowserRouter>
         <div className="min-h-screen md:flex">
@@ -74,25 +77,25 @@ class App extends Component {
                   to="/map"
                   className="menu-item flex flex-col justify-start items-center content-center text-center w-full bg-blue-700 py-2 cursor-pointer"
                 >
-                  Map
+                  {languageSettingVal === "English" ? "Map" : "Карта місцевості"}
                 </Link>
                 <Link
                   to="/"
                   className="menu-item flex flex-col justify-start items-center content-center text-center w-full bg-blue-700 py-2 cursor-pointer"
                 >
-                  Photos
+                  {languageSettingVal === "English" ? "Photos" : "Фото"}
                 </Link>
                 <Link
                   to="/created-map"
                   className="menu-item flex flex-col justify-start items-center content-center text-center w-full bg-blue-700 py-2 cursor-pointer"
                 >
-                  Created map
+                  {languageSettingVal === "English" ? "Created map" : "Скомпонована карта"}
                 </Link>
                 <Link
                   to="/settings"
                   className="menu-item flex flex-col justify-start items-center content-center text-center w-full bg-blue-700 py-2 cursor-pointer"
                 >
-                  Settings
+                  {languageSettingVal === "English" ? "Settings" : "Налаштування"}
                 </Link>
               </div>
 
@@ -106,25 +109,25 @@ class App extends Component {
               <VariablesBlock
                 vars={[
                   {
-                    name: 'Duration',
+                    name: languageSettingVal === "English" ? 'Duration' : "Укр",
                     val: '8.60',
                     icon: 'coffee',
                     measuredIn: 'minutes'
                   },
                   {
-                    name: 'Resolution',
+                    name: languageSettingVal === "English" ? 'Resolution' : "Укр1",
                     val: 1.7,
                     icon: 'coffee',
                     measuredIn: 'in/px'
                   },
                   {
-                    name: 'Area',
+                    name: languageSettingVal === "English" ? 'Area' : "Укр2",
                     val: 49,
                     icon: 'coffee',
                     measuredIn: 'acres'
                   },
                   {
-                    name: 'Battery',
+                    name: languageSettingVal === "English" ? 'Battery' : "Укр3",
                     val: 3900,
                     icon: 'coffee',
                     measuredIn: 'mph'
@@ -134,7 +137,7 @@ class App extends Component {
 
               <Link to="/created-map">
                 <div>
-                  <img src={"data:image/png;base64," + this.props.mapPath} />
+                  <img src={"data:image/png;base64," + this.props.mapPath} alt="No img yet"/>
                 </div>
               </Link>
             </Sidebar>
@@ -161,11 +164,13 @@ let mapDispatchToProps = dispatch => {
 };
 
 let mapStateToProps = state => {
-  // console.log('STATE :', state);
+  console.log('STATE :', state);
   // console.log('state.mapPath :', state.photos.mapPath);
+  
   return {
     mapPath: state.photos.mapPath,
-    photos: state.photos
+    photos: state.photos,
+    settings: state.settings.settings
   };
 };
 

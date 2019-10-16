@@ -62,7 +62,7 @@ class Photo {
     let jimps = [];
 
     // FIXME: -1 is not right
-    for (let i = 0; i < imgs.length - 1; i++) {
+    for (let i = 0; i < imgs.length; i++) {
       let j = await Jimp.read(imgs[i].src);
       jimps.push(j);
     }
@@ -70,7 +70,8 @@ class Photo {
       canvas.composite(j, imgs[idx].x, imgs[idx].y);
     }
     //this.inverceColor(canvas);
-    
+
+    canvas.flip(true, false);    
     canvas.write(outputPath, () => console.log('DONE COMPOSING'));
 
     return canvas;

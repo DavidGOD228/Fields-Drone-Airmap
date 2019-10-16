@@ -473,9 +473,10 @@ class MyMap extends Component {
           let pathNode = {
             point: vpp,
             xn: x, 
-            yn: y
+            yn: y,
+            type: "MAKE_PHOTO"
           };
-          // drone.addToPath(pathNode);
+          drone.addToPath(pathNode);
           composedPath.push(pathNode);
 
           let mark = new window.google.maps.Marker({
@@ -489,11 +490,12 @@ class MyMap extends Component {
       }
     }
 
-    composedPathBack = [...composedPath].reverse();
-    drone.addComposedPath(composedPath)
-    drone.addComposedPath(composedPathBack)
-    drone.distributeComposedPaths();
-    console.log('drone.path :', drone.path);
+    
+    console.log('mapToVector(this.state.base) :', mapToVector(this.state.base));
+    drone.addToPath({
+      point: mapToVector(this.state.base),      
+      type: "BASE"
+    });
 
     this.update.call(that);
   }

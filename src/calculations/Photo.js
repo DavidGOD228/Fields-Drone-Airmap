@@ -1,3 +1,4 @@
+const Rembrandt = require('rembrandt/build/browser');
 const mergeImg = window.require('merge-img');
 const mergeImages = window.require('merge-images');
 const Jimp = window.require('jimp');
@@ -7,7 +8,7 @@ const http = window.require('http');
 const https = window.require('https');
 const path = window.require('path');
 
-const se = window.require("sightengine")('540865617', '38b6kZYxVz6DyZLGv82G')
+const se = window.require('sightengine')('540865617', '38b6kZYxVz6DyZLGv82G');
 
 class Photo {
   constructor({ url }, additional) {
@@ -70,7 +71,7 @@ class Photo {
       canvas.composite(j, imgs[idx].x, imgs[idx].y);
     }
     //this.inverceColor(canvas);
-    
+
     canvas.write(outputPath, () => console.log('DONE COMPOSING'));
 
     return canvas;
@@ -86,20 +87,51 @@ class Photo {
       });
   }
 
-  static getFileBlurFactor(filepath) {
-    return se.check(['properties']).set_file(filepath).then(function(result) {
-      console.log("result", result)
-      return result.sharpness;
-    }).catch(function(err) {
-      console.log('err :', err);
+  static async comparingImages(filepathA, filepathB) {
+    var tempA = await fs.readFileSync(filepathA);
+    var tempB = await fs.readFileSync(filepathB);
+
+    const rembrandt = new Rembrandt({
+      imageA: tempA,
+      imageB: tempB,
+      thresholdType: Rembrandt.THRESHOLD_PERCENT,
+      maxThreshold: 0.01,
+      maxDelta: 20,
+      maxOffset: 15,
+      renderComposition: true, // Should Rembrandt render a composition image?
+      compositionMaskColor: Rembrandt.Color.RED // Color of unmatched pixels
     });
+
+    rembrandt
+      .compare()
+      .then(result => {
+        console.log('Passed:', result.passed);
+        console.log('Difference:', (result.threshold * 100).toFixed(2), '%');
+        console.log('Composition image buffer:', result.compositionImage);
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }
+
+  static getFileBlurFactor(filepath) {
+    return se
+      .check(['properties'])
+      .set_file(filepath)
+      .then(function(result) {
+        console.log('result', result);
+        return result.sharpness;
+      })
+      .catch(function(err) {
+        console.log('err :', err);
+      });
   }
 }
 
 // (async () => {
-//   console.log("shit: ", await Photo.getFileBlurFactor("./4out.jpg")); 
+//   console.log("shit: ", await Photo.getFileBlurFactor("./4out.jpg"));
 // })();
 
-Photo.getFileBlurFactor("./4out.jpg").then(res => console.log('res :', res))
+Photo.getFileBlurFactor('./4out.jpg').then(res => console.log('res :', res));
 
 export default Photo;

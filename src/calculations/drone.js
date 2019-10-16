@@ -44,6 +44,7 @@ class Drone {
     );
 
     this.photos = [];
+    this.bluredDetermine = [];
     this.photoMapObjs = [];
 
     this.started = false;
@@ -83,14 +84,16 @@ class Drone {
 
   distributeComposedPaths() {
     // this.composedPaths.map(cp => this.path.push(...cp));
-    this.composedPaths.map(cp => cp.map(el => {
-      this.path.push({
-        position: el.point,
-        xn: el.xn,
-        yn: el.yn,
-        reached: false
-      });
-    }))
+    this.composedPaths.map(cp =>
+      cp.map(el => {
+        this.path.push({
+          position: el.point,
+          xn: el.xn,
+          yn: el.yn,
+          reached: false
+        });
+      })
+    );
   }
 
   angleTo(other) {
@@ -141,8 +144,8 @@ class Drone {
     point,
     settings = {
       // size: '400x400',
-      size: `${this.dronePhotoDimentions.x + 2}x${this.dronePhotoDimentions.y}`,
-      zoom: 18,
+      size: `${this.dronePhotoDimentions.x}x${this.dronePhotoDimentions.y}`,
+      zoom: 17,
       maptype: 'satellite',
       key: 'AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI'
     }
@@ -152,7 +155,7 @@ class Drone {
 
     settings.center = point.lat + ',' + point.lng;
     link = this.mashLink(base, settings);
-    
+
     return link;
   }
 
@@ -200,8 +203,11 @@ class Drone {
           this.currentTarget.reached = true;
           this.path[this.currentTargetIdx].reached = true;
 
-          if(this.currentSubflightIdx === 0 && this.currentTargetIdx > this.composedPaths[0].length) {
-            this.fullFolderPath = this.folderPath + "/Subflight2";
+          if (
+            this.currentSubflightIdx === 0 &&
+            this.currentTargetIdx > this.composedPaths[0].length
+          ) {
+            this.fullFolderPath = this.folderPath + '/Subflight2';
             this.relativeCounter = 0;
             this.currentSubflightIdx++;
             if (!fs.existsSync(this.fullFolderPath)) {
@@ -209,11 +215,15 @@ class Drone {
             }
           }
           // MAKE A PHOTO
-          console.log('this.currentTarget.position :', this.currentTarget.position);
+          console.log(
+            'this.currentTarget.position :',
+            this.currentTarget.position
+          );
           let photoLink = this.getPhotoLink(
             // vectorMapProxy(this.path[this.currentTargetIdx].position)
             vectorMapProxy(this.currentTarget.position)
           );
+
           this.photos.push(photoLink);
           // SAVE FILE
           let filePath =
@@ -222,6 +232,16 @@ class Drone {
             this.relativeCounter.toString().concat('.jpg');
           if (this.savePhotos) {
             Photo.downloadUrl(filePath, photoLink);
+            if (Math.floor(Math.random() * 2)) {
+              this.bluredDetermine.push(true);
+              Photo.blurUrl(photoLink, filePath);
+              Photo.comparingImages(
+                filePath,
+                'C:/Users/dtrum/Desktop/image.png'
+              );
+              console.log(this.photos);
+            } else this.bluredDetermine.push(false);
+            console.log(this.bluredDetermine);
           }
 
           // let droneDir = getEnumDirection(this.velocity.getAngleFull());
@@ -233,6 +253,7 @@ class Drone {
               src: filePath
             }
           );
+
           this.photoMapObjs.push(photo);
           this.pushPhoto(photo);
 

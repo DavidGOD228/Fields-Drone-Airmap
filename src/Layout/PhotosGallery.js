@@ -63,7 +63,7 @@ class PhotosGallery extends Component {
               <div
                 className={`appear-anim photo-gallery-item ${this.state
                   .expandedIdx === idx && "photo-gallery-item-expanded"}`}
-                key={f.url}
+                key={f.url + Math.random() * Math.random()}
               >
                 <div
                   className="photo-expand-button icon-wrapper click-scale-down text-white"

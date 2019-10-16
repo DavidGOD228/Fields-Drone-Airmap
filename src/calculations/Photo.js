@@ -180,7 +180,7 @@ class Photo {
     // console.log('canvas, j :', canvas, j);
     // canvas.composite(j, img.x, img.y);
 
-    //this.inverceColor(canvas);
+    this.inverceColor(canvas);
 
     canvas.write(outputPath, () => console.log('DONE COMPOSING'));
 

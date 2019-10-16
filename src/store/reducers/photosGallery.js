@@ -5,19 +5,19 @@ let initialState = {
 let photoReducer = (state = initialState, action) => {
   switch (action.type) {
     case "PUSH_PHOTO":
-      console.log("PUSH_PHOTO", {
-        ...state,
-        photos: [...state.photos, action.photo],
-      });
+      // console.log("PUSH_PHOTO", {
+      //   ...state,
+      //   photos: [...state.photos, action.photo],
+      // });
       return {
         ...state,
         photos: [...state.photos, action.photo],
       };
     case "SET_MAP_PATH":
-      console.log("SET_MAP_PATH", {
-        ...state,
-        mapPath: action.mapPath,
-      });
+      // console.log("SET_MAP_PATH", {
+      //   ...state,
+      //   mapPath: action.mapPath,
+      // });
       return {
         ...state,
         mapPath: action.mapPath,

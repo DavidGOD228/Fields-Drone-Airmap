@@ -15,8 +15,8 @@ class CreatedMap extends Component {
 }
 
 let mapStateToProps = state => {
-  console.log('STATE :', state);
-  console.log('state.mapPath :', state.photos.mapPath);
+  // console.log('STATE :', state);
+  // console.log('state.mapPath :', state.photos.mapPath);
   return {
     mapPath: state.photos.mapPath,
     photos: state.photos

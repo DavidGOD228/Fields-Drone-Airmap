@@ -29,8 +29,11 @@ class Drone {
 
     this.targetMode = this.targetMode || false;
     this.path = this.path || [];
+    this.composedPaths = this.composedPaths || [];
+    this.currentComposedPathIdx = 0;
     this.coveredPath = [];
     this.currentTargetIdx = 0;
+    this.currentSubflightIdx = 0;
     this.currentTarget = this.path[this.currentTargetIdx] || null;
     this.finishedFlight = false;
     this.photoBounds = Rectangle.newFromCenter(
@@ -71,6 +74,22 @@ class Drone {
       yn: v.yn,
       reached: false
     });
+  }
+
+  addComposedPath(pathArr) {
+    this.composedPaths.push(pathArr);
+  }
+
+  distributeComposedPaths() {
+    // this.composedPaths.map(cp => this.path.push(...cp));
+    this.composedPaths.map(cp => cp.map(el => {
+      this.path.push({
+        position: el.point,
+        xn: el.xn,
+        yn: el.yn,
+        reached: false
+      });
+    }))
   }
 
   angleTo(other) {
@@ -132,13 +151,7 @@ class Drone {
 
     settings.center = point.lat + ',' + point.lng;
     link = this.mashLink(base, settings);
-    // let filePath =
-    //   this.folderPath + '/' + this.photos.length.toString().concat('.jpg');
-
-    // if(this.savePhotos) {
-    //   Photo.downloadUrl(filePath, link);
-    // }
-
+    
     return link;
   }
 
@@ -161,6 +174,8 @@ class Drone {
       if (this.savePhotos) {
         fs.closeSync(fs.openSync(this.folderPath + '/map.jpg', 'w'));
       }
+      // this.distributeComposedPaths();
+      console.log('this.path :', this.path);
       this.startCallback();
     }
 
@@ -181,6 +196,7 @@ class Drone {
           this.path[this.currentTargetIdx].reached = true;
 
           // MAKE A PHOTO
+          console.log('this.currentTarget.position :', this.currentTarget.position);
           let photoLink = this.getPhotoLink(
             // vectorMapProxy(this.path[this.currentTargetIdx].position)
             vectorMapProxy(this.currentTarget.position)
@@ -207,10 +223,6 @@ class Drone {
           this.photoMapObjs.push(photo);
           this.pushPhoto(photo);
 
-          // COMPOSE PHOTO WITH MAP
-          // this.field.composeWithMap(photo)
-          // console.log('field.photosMap.mapImg :', this.field.photosMap.mapImg);
-
           let coveredRect = new window.google.maps.Rectangle({
             strokeColor: '#FF0000',
             strokeOpacity: 0.8,
@@ -234,44 +246,13 @@ class Drone {
           this.velocity.setLength(0);
           this.finishedFlight = true;
           this.ended = true;
-          console.log('this.mapPhotoObjs :', this.photoMapObjs);
-          // this.field.composeWithMap(photo)
-          // TODO: SET MAP PATH
 
-          // this.props.setMapPath(field.photosMap.path);
-
-          // console.log('this.field.photoMap :', this.field);
-          // this.field.composeMap(this.photoMapObjs).then(() => {
-          //   console.log('this.field.photoMap.path :', this.field.photosMap.path);
-          //   var base64str = base64_encode(this.field.photosMap.path);
-
-          //   // const base64path = fs.readFileSync(this.field.photosMap.path).toString('base64');
-          //   console.log('base64path :', base64str);
-          //   this.setMapPath(base64str);
-          // })
           this.field.composeMap(this.photoMapObjs).then(() => {
-            // setTimeout(() => {
-            console.log(
-              'this.field.photoMap.path :',
-              this.field.photosMap.path
-            );
             fs.readFile(this.field.photosMap.path, (err, data) => {
-              console.log('data :', data);
-              console.log('data.toString("base64") :', data.toString('base64'));
               let b64 = data.toString('base64');
               this.setMapPath(b64);
             });
-            // }, 3000);
           });
-
-          // (async () => {
-          //   await this.field.composeMap(this.photoMapObjs);
-
-          //   const base64path = await fs.readFile(this.field.photosMap.path).toString('base64');
-          //   console.log('base64path :', base64path);
-          //   this.setMapPath(base64path);
-          // })();
-
           this.endCallback();
         }
       }
@@ -294,6 +275,124 @@ class Drone {
       }
     });
   }
+
+  // async update() {
+  //   if (!this.started) {
+  //     this.started = true;
+  //     this.mapOffsetXStart = 0;
+  //     if (this.savePhotos) {
+  //       fs.closeSync(fs.openSync(this.folderPath + '/map.jpg', 'w'));
+  //     }
+  //     // this.distributeComposedPaths();
+  //     console.log('this.path :', this.path);
+  //     this.startCallback();
+  //   }
+
+  //   if (this.targetMode) {
+  //     // let pVector = vectorMapProxy(mapToVector(p));
+  //     if (!this.currentTarget && this.currentTargetIdx < this.path.length) {
+  //       this.currentTarget = this.path[this.currentTargetIdx];
+  //     }
+
+  //     var d = this.currentTarget
+  //       ? this.position.distanceTo(this.currentTarget.position)
+  //       : -Infinity;
+
+  //     if (d <= this.velocity.getLength()) {
+  //       if (this.currentTargetIdx < this.path.length) {
+  //         // SET NEW STATE
+  //         this.currentTarget.reached = true;
+  //         this.path[this.currentTargetIdx].reached = true;
+
+  //         // MAKE A PHOTO
+  //         let photoLink = this.getPhotoLink(
+  //           // vectorMapProxy(this.path[this.currentTargetIdx].position)
+  //           vectorMapProxy(this.currentTarget.position)
+  //         );
+  //         this.photos.push(photoLink);
+
+  //         const nComposedPathsEls = this.composedPaths.slice(0, this.currentSubflightIdx + 1).reduce((acc, cur) => {
+  //           return acc + cur.length;
+  //         });
+  //         if(this.currentTargetIdx > nComposedPathsEls
+  //           // this.composedPaths[this.currentSubflightIdx].length
+  //           ) {
+  //           this.currentSubflightIdx++;
+  //         }
+
+  //         // SAVE FILE
+  //         let filePath =
+  //           `${this.folderPath}/Subflight${this.currentSubflightIdx}/${this.photos.length.toString().concat('.jpg')}`;
+
+  //           console.log('filePath :', filePath);
+  //         if (this.savePhotos) {
+  //           Photo.downloadUrl(filePath, photoLink);
+  //         }
+
+  //         // let droneDir = getEnumDirection(this.velocity.getAngleFull());
+  //         let photo = new Photo(
+  //           { url: this.photos[this.photos.length - 1] },
+  //           {
+  //             x: this.currentTarget.xn * this.field.dronePhotoDimentions.x,
+  //             y: this.currentTarget.yn * this.field.dronePhotoDimentions.y,
+  //             src: filePath
+  //           }
+  //         );
+  //         this.photoMapObjs.push(photo);
+  //         this.pushPhoto(photo);
+
+  //         let coveredRect = new window.google.maps.Rectangle({
+  //           strokeColor: '#FF0000',
+  //           strokeOpacity: 0.8,
+  //           strokeWeight: 0,
+  //           fillColor: '#FF0000',
+  //           fillOpacity: 0.35,
+  //           map: this.map,
+  //           bounds: {
+  //             north: this.position.lat + this.overlayRadiusLat,
+  //             south: this.position.lat - this.overlayRadiusLat,
+  //             east: this.position.lng + this.overlayRadiusLng,
+  //             west: this.position.lng - this.overlayRadiusLng
+  //           }
+  //         });
+
+  //         this.coveredPath.push(coveredRect);
+
+  //         this.currentTargetIdx++;
+  //         this.currentTarget = this.path[this.currentTargetIdx] || null;
+  //       } else {
+  //         this.velocity.setLength(0);
+  //         this.finishedFlight = true;
+  //         this.ended = true;
+
+  //         this.field.composeMap(this.photoMapObjs).then(() => {
+  //           fs.readFile(this.field.photosMap.path, (err, data) => {
+  //             let b64 = data.toString('base64');
+  //             this.setMapPath(b64);
+  //           });
+  //         });
+  //         this.endCallback();
+  //       }
+  //     }
+  //     if (this.currentTarget) {
+  //       this.velocity.setAngle(this.angleTo(this.currentTarget.position));
+  //     }
+  //   }
+
+  //   this.position.addTo(this.velocity);
+  //   this.marker.setPosition(
+  //     new this.window.google.maps.LatLng(this.position.lat, this.position.lng)
+  //   );
+
+  //   this.fieldOverlay.setOptions({
+  //     bounds: {
+  //       north: this.position.lat + this.overlayRadiusLat,
+  //       south: this.position.lat - this.overlayRadiusLat,
+  //       east: this.position.lng + this.overlayRadiusLng,
+  //       west: this.position.lng - this.overlayRadiusLng
+  //     }
+  //   });
+  // }
 
   findClosestPoint(ps) {
     let closestP = Infinity;

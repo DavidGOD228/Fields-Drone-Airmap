@@ -69,9 +69,8 @@ class Photo {
     for (let [idx, j] of jimps.entries()) {
       canvas.composite(j, imgs[idx].x, imgs[idx].y);
     }
-
     //this.inverceColor(canvas);
-
+    
     canvas.write(outputPath, () => console.log('DONE COMPOSING'));
 
     return canvas;

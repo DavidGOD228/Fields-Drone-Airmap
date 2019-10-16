@@ -30,8 +30,12 @@ fs.readFile("flight_number.txt", function(err, buf) {
 });
 
 class MyMap extends Component {
+
   constructor(props) {
     super(props);
+    const { settings } = this.props;
+    const languageSettingVal = settings.find(el => el.label === "Language").value;
+
     this.state = {
       photos: [],
 
@@ -41,7 +45,7 @@ class MyMap extends Component {
       readyForStart: false,
 
       currentLabelIdx: 0,
-      labels: ["Set the base", "Set the field"],
+      labels: languageSettingVal === "English" ? ["Set the base", "Set the field"] : ["Встановіть базу", "Встановіть поле"],
 
       map: null,
       drawingManager: null,
@@ -430,6 +434,7 @@ class MyMap extends Component {
       this.state.drone.findClosestPoint(this.state.field.bounds.toArray())
     );
 
+    // MainCalculation()
     
     let { field, drone, base } = this.state;
     field.setRadiuses(drone.overlayRadiusLat, drone.overlayRadiusLng);
@@ -446,6 +451,9 @@ class MyMap extends Component {
     console.log('field.photosMap.mapImg :', field.photosMap.mapImg);
 
     console.log("field :", field.squaresArray);
+    const composedPath = [];
+    let composedPathBack;
+    
 
     for (let [y, p] of field.squaresArray.entries()) {
       if (y % 2 !== 0) {
@@ -462,11 +470,13 @@ class MyMap extends Component {
 
         if (field.isPointInside(vectorToMap(vpp))) {
         // if (field.isRectInside(rect)) {
-          drone.addToPath({
+          let pathNode = {
             point: vpp,
             xn: x, 
             yn: y
-          });
+          };
+          // drone.addToPath(pathNode);
+          composedPath.push(pathNode);
 
           let mark = new window.google.maps.Marker({
             position: {
@@ -478,6 +488,13 @@ class MyMap extends Component {
         }
       }
     }
+
+    composedPathBack = [...composedPath].reverse();
+    drone.addComposedPath(composedPath)
+    drone.addComposedPath(composedPathBack)
+    drone.distributeComposedPaths();
+    console.log('drone.path :', drone.path);
+
     this.update.call(that);
   }
 
@@ -523,7 +540,7 @@ class MyMap extends Component {
               <div
                 className={`appear-anim photo-gallery-item  ${this.state
                   .expandedIdx === idx && "photo-gallery-item-expanded"}`}
-                key={f.url}
+                key={f.url + Math.random() * Math.random()}
               >
                 <div
                   className="photo-expand-button icon-wrapper click-scale-down text-white"
@@ -551,8 +568,10 @@ let mapDispatchToProps = dispatch => {
 };
 
 let mapStateToProps = state => {
+  // console.log('SHIT STATE :', state);
   return {
     photos: state.photos,
+    settings: state.settings.settings
   };
 };
 

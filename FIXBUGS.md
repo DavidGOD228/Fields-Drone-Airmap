@@ -23,3 +23,7 @@
   [DAVID] fix a bug with shifting photos in the map
   [DAVID] fix a bug with empty spaces between photos in the map
   [ROMCHIK] presentation is my occupation
+  [STAS] make parameters inputs & sliders
+  [STAS] create different drones and their setted up properties
+  [STAS] make moving polygons work
+  [STAS] 

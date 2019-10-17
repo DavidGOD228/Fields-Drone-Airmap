@@ -60,7 +60,7 @@ class Photo {
   static async compositeImagesAndSave(mainImg, imgs, outputPath) {
     let canvas = mainImg.mapImg;
     let jimps = [];
-
+    
     // FIXME: -1 is not right
     for (let i = 0; i < imgs.length; i++) {
       let j = await Jimp.read(imgs[i].src);

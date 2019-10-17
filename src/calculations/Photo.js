@@ -88,8 +88,8 @@ class Photo {
   }
 
   static async comparingImages(filepathA, filepathB) {
-    var tempA = await fs.readFileSync(filepathA);
-    var tempB = await fs.readFileSync(filepathB);
+    var tempA = filepathA;
+    var tempB = filepathB;
 
     const rembrandt = new Rembrandt({
       imageA: tempA,

@@ -219,6 +219,7 @@ class Drone {
             'this.currentTarget.position :',
             this.currentTarget.position
           );
+
           let photoLink = this.getPhotoLink(
             // vectorMapProxy(this.path[this.currentTargetIdx].position)
             vectorMapProxy(this.currentTarget.position)
@@ -230,20 +231,18 @@ class Drone {
             this.fullFolderPath +
             '/' +
             this.relativeCounter.toString().concat('.jpg');
+          console.log('before');
+
           if (this.savePhotos) {
             Photo.downloadUrl(filePath, photoLink);
             if (Math.floor(Math.random() * 2)) {
               this.bluredDetermine.push(true);
               Photo.blurUrl(photoLink, filePath);
-              Photo.comparingImages(
-                filePath,
-                'C:/Users/dtrum/Desktop/image.png'
-              );
               console.log(this.photos);
             } else this.bluredDetermine.push(false);
             console.log(this.bluredDetermine);
           }
-
+          console.log('after');
           // let droneDir = getEnumDirection(this.velocity.getAngleFull());
           let photo = new Photo(
             { url: this.photos[this.photos.length - 1] },

@@ -408,7 +408,7 @@ class Drone {
   //     bounds: {
   //       north: this.position.lat + this.overlayRadiusLat,
   //       south: this.position.lat - this.overlayRadiusLat,
-  //       east: this.position.lng + this.overlayRadiusLng,
+  //       east: this.pposition.lng + this.overlayRadiusLng,
   //       west: this.position.lng - this.overlayRadiusLng
   //     }
   //   });

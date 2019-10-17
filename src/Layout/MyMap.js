@@ -14,7 +14,11 @@ import Vector from "../calculations/Vector";
 import Field from "../calculations/Field";
 import RectField from "../calculations/RectField";
 import { MainCalculation } from "../calculations/flyCalculations";
-import { mapToVector, vectorToMap, getLngFactor } from "../calculations/helpers";
+import {
+  mapToVector,
+  vectorToMap,
+  getLngFactor
+} from "../calculations/helpers";
 import { pushPhoto, setMapPath } from "../store/actions/photosGallery";
 import Photo from "../calculations/Photo";
 import { scrollDown } from "../components/helpers";
@@ -30,11 +34,11 @@ fs.readFile("flight_number.txt", function(err, buf) {
 });
 
 class MyMap extends Component {
-
   constructor(props) {
     super(props);
     const { settings } = this.props;
-    const languageSettingVal = settings.find(el => el.label === "Language").value;
+    const languageSettingVal = settings.find(el => el.label === "Language")
+      .value;
 
     this.state = {
       photos: [],
@@ -45,7 +49,10 @@ class MyMap extends Component {
       readyForStart: false,
 
       currentLabelIdx: 0,
-      labels: languageSettingVal === "English" ? ["Set the base", "Set the field"] : ["Встановіть базу", "Встановіть поле"],
+      labels:
+        languageSettingVal === "English"
+          ? ["Set the base", "Set the field"]
+          : ["Встановіть базу", "Встановіть поле"],
 
       map: null,
       drawingManager: null,
@@ -198,8 +205,9 @@ class MyMap extends Component {
           //   y: 420
           // },
           dronePhotoDimentions: this.state.drone.dronePhotoDimentions,
-          folderPath: folderPath
-          // drawSquares: false
+          folderPath: folderPath,
+          drawSquares: false,
+          drawBounds: false
         });
         console.log("polyArr :", polyArr);
         this.setState({
@@ -290,8 +298,8 @@ class MyMap extends Component {
 
         console.log("Drone :", Drone);
         let droneDim = 200;
-//         25.497646938259912 - 25.498987938259912
-// -0.0013410000000000366
+        //         25.497646938259912 - 25.498987938259912
+        // -0.0013410000000000366
 
         let droneMaxHeight = 0.000005 * droneDim;
         // let droneMaxHeight = 0.0013410000000000366 ;
@@ -302,8 +310,9 @@ class MyMap extends Component {
             // speed: 0.00004,
             speed: 0.00002,
             overlayRadiusLat: droneMaxHeight / 2,
-            overlayRadiusLng: (droneMaxHeight / 2) / getLngFactor(marker.getPosition().lat()),
-              // 0.0002 / Math.cos(marker.getPosition().lat() * 0.01745),
+            overlayRadiusLng:
+              droneMaxHeight / 2 / getLngFactor(marker.getPosition().lat()),
+            // 0.0002 / Math.cos(marker.getPosition().lat() * 0.01745),
             direction: Math.PI / 2,
 
             maxHeight: droneMaxHeight,
@@ -417,11 +426,11 @@ class MyMap extends Component {
   }
 
   async startFlight() {
-    if(savePhotos) {
+    if (savePhotos) {
       if (!fs.existsSync(folderPath)) {
         fs.mkdirSync(folderPath);
       }
-  
+
       fs.writeFile("flight_number.txt", parseInt(flightNumber) + 1, function() {
         console.log("done");
       });
@@ -435,44 +444,45 @@ class MyMap extends Component {
     );
 
     // MainCalculation()
-    
+
     let { field, drone, base } = this.state;
     field.setRadiuses(drone.overlayRadiusLat, drone.overlayRadiusLng);
     field.distributeOnSquares();
     await field.createMap();
     this.state.drone.setField(field);
-    console.log('FIELD :', field);
-    
+    console.log("FIELD :", field);
+
     // MAP REDUX
     // const logoPath = '/path/to/my/image.png';
-    
+
     // const logo = fs.readFileSync(logoPath).toString('base64');
     // this.props.setMapPath(field.photosMap.path);
-    console.log('field.photosMap.mapImg :', field.photosMap.mapImg);
+    console.log("field.photosMap.mapImg :", field.photosMap.mapImg);
 
     console.log("field :", field.squaresArray);
     const composedPath = [];
     let composedPathBack;
-    
 
+    console.log("field.SquaresArray :", field.SquaresArray);
     for (let [y, p] of field.squaresArray.entries()) {
       if (y % 2 !== 0) {
         p = p.reverse();
       }
+
       for (let [x, pp] of p.entries()) {
         let vpp = drone.mapToCenter(mapToVector(pp.bounds.center));
-        let rect = Rectangle.newFromCenter(vectorToMap(vpp), drone.overlayRadiusLat, drone.overlayRadiusLng)
-        // console.log("vpp :", vectorToMap(vpp).lat == rect.center.lat, vectorToMap(vpp), rect.center);
-        // console.log(
-        //   "field.isPointInside(vpp) :",
-        //   field.isPointInside(vectorToMap(vpp))
-        // );
+        let rect = Rectangle.newFromCenter(
+          vectorToMap(vpp),
+          drone.overlayRadiusLat,
+          drone.overlayRadiusLng
+        );
+        console.log("x, y :", x, y);
+        const isInside = field.isRectInside(rect);
 
-        if (field.isPointInside(vectorToMap(vpp))) {
-        // if (field.isRectInside(rect)) {
+        if (isInside) {
           let pathNode = {
             point: vpp,
-            xn: x, 
+            xn: x,
             yn: y,
             type: "MAKE_PHOTO"
           };
@@ -490,10 +500,9 @@ class MyMap extends Component {
       }
     }
 
-    
-    console.log('mapToVector(this.state.base) :', mapToVector(this.state.base));
+    console.log("mapToVector(this.state.base) :", mapToVector(this.state.base));
     drone.addToPath({
-      point: mapToVector(this.state.base),      
+      point: mapToVector(this.state.base),
       type: "BASE"
     });
 

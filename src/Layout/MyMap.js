@@ -557,7 +557,7 @@ class MyMap extends Component {
         ></div>
 
         <div className="last-shots-container">
-          {/* {this.props.photos.length > 0 &&
+          {this.props.photos.length > 0 &&
             this.props.photos.map((f, idx) => (
               <div
                 className={`appear-anim photo-gallery-item  ${this.state
@@ -576,7 +576,7 @@ class MyMap extends Component {
                 </div>
                 <img src={f.url} />
               </div>
-            ))} */}
+            ))}
         </div>
       </div>
     );

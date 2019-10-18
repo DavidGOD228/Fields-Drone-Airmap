@@ -11,8 +11,8 @@ let photoReducer = (state = initialState, action) => {
       // });
       return {
         ...state,
-        // photos: [...state.photos, action.photo]
-        photos: state.photos.concat(action.photo)
+        photos: [...state.photos, action.photo]
+        // photos: state.photos.concat(action.photo)
       };
     // return [...state.photos, action.photo];
     case "SET_MAP_PATH":

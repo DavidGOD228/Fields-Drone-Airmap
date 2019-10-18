@@ -20,6 +20,7 @@ import {
   getLngFactor
 } from "../calculations/helpers";
 import { pushPhoto, setMapPath } from "../store/actions/photosGallery";
+import { updateDroneParameter } from "../store/actions/droneParameters";
 import Photo from "../calculations/Photo";
 import { scrollDown } from "../components/helpers";
 
@@ -322,7 +323,12 @@ class MyMap extends Component {
             // charge: 10000000,
             // flightCosts: 0,
             // photoCosts: 0,
+
+            batteryCharge: 2000,
+            batteryPerPhoto: 20,
+            batteryPerMove: 10,
             pushPhoto: this.props.pushPhoto,
+            updateDroneParameter: this.props.updateDroneParameter,
             setMapPath: this.props.setMapPath,
             folderPath: folderPath,
             savePhotos: savePhotos,
@@ -466,8 +472,13 @@ class MyMap extends Component {
     console.log("field.SquaresArray :", field.SquaresArray);
     for (let [y, p] of field.squaresArray.entries()) {
       if (y % 2 !== 0) {
-        p = p.reverse();
+        // p = p.reverse();
+        // let copiedP = p.reverse();
+        // for(let i = 0; i < arrr.length; i++) {
+        //   composedArr.push({ p: arrReversed[i].p, ...arrr[i]})
+        // }
       }
+      console.log("p :", p);
 
       for (let [x, pp] of p.entries()) {
         let vpp = drone.mapToCenter(mapToVector(pp.bounds.center));
@@ -546,12 +557,13 @@ class MyMap extends Component {
         ></div>
 
         <div className="last-shots-container">
-          {this.props.photos.photos.length > 0 &&
-            this.props.photos.photos.map((f, idx) => (
+          {/* {this.props.photos.length > 0 &&
+            this.props.photos.map((f, idx) => (
               <div
                 className={`appear-anim photo-gallery-item  ${this.state
                   .expandedIdx === idx && "photo-gallery-item-expanded"}`}
-                key={f.url + Math.random() * Math.random()}
+                key={Math.random() * Math.random()}
+                // key={f.url + Math.random() * Math.random()}
               >
                 <div
                   className="photo-expand-button icon-wrapper click-scale-down text-white"
@@ -564,7 +576,7 @@ class MyMap extends Component {
                 </div>
                 <img src={f.url} />
               </div>
-            ))}
+            ))} */}
         </div>
       </div>
     );
@@ -574,15 +586,17 @@ class MyMap extends Component {
 let mapDispatchToProps = dispatch => {
   return {
     pushPhoto: photo => dispatch(pushPhoto(photo)),
-    setMapPath: mapPath => dispatch(setMapPath(mapPath))
+    setMapPath: mapPath => dispatch(setMapPath(mapPath)),
+    updateDroneParameter: (name, val) =>
+      dispatch(updateDroneParameter(name, val))
   };
 };
 
 let mapStateToProps = state => {
-  // console.log('SHIT STATE :', state);
+  console.log("SHIT STATE :", state);
   return {
-    photos: state.photos,
-    settings: state.settings.settings
+    photos: state.photosData.photos,
+    settings: state.settings
   };
 };
 

@@ -60,7 +60,6 @@ class Photo {
 
   static async blurUrl(url, outputFilepath, blurFactor = 20) {
     const image = await Jimp.read(url);
-    console.log("image :", image);
 
     image
       .blur(blurFactor, function(err) {
@@ -70,7 +69,6 @@ class Photo {
   }
 
   static async compositeImages(canvas, img) {
-    console.log("CALLED CI");
     let j = await Jimp.read(img.src);
     canvas.composite(j, img.x, img.y);
     return canvas;
@@ -123,7 +121,6 @@ class Photo {
       .check(["properties"])
       .set_file(filepath)
       .then(function(result) {
-        console.log("result", result);
         return result.sharpness;
       })
       .catch(function(err) {

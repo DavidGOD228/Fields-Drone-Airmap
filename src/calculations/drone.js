@@ -10,7 +10,6 @@ import {
   getDirectionLabel,
   base64_encode
 } from "./helpers";
-
 import { MainCalculation } from "../calculations/flyCalculations";
 
 import Photo from "../calculations/Photo";
@@ -72,7 +71,7 @@ class Drone {
 
   addToPath(v) {
     switch (v.type) {
-      case 'MAKE_PHOTO':
+      case "MAKE_PHOTO":
         this.path.push({
           position: v.point,
           xn: v.xn,
@@ -81,7 +80,7 @@ class Drone {
           type: v.type
         });
         break;
-      case 'BASE':
+      case "BASE":
         this.path.push({
           position: v.point,
           reached: false,
@@ -204,7 +203,7 @@ class Drone {
         this.secondsSpent++;
         this.updateDroneParameter("Час польоту", this.secondsSpent);
       }, 1000);
-      
+
       this.startCallback();
     }
 
@@ -225,7 +224,7 @@ class Drone {
           this.path[this.currentTargetIdx].reached = true;
 
           // MAKE A PHOTO
-
+          if (this.path[this.currentTargetIdx].type === "MAKE_PHOTO") {
             let photoLink = this.getPhotoLink(
               // vectorMapProxy(this.path[this.currentTargetIdx].position)
               vectorMapProxy(this.currentTarget.position)
@@ -241,13 +240,8 @@ class Drone {
               this.relativeCounter.toString().concat(".jpg");
             if (this.savePhotos) {
               Photo.downloadUrl(filePath, photoLink);
-              if (Math.floor(Math.random() * 2)) {
-                this.bluredDetermine.push(true);
-                Photo.blurUrl(photoLink, filePath);
-                console.log(this.photos);
-              } else this.bluredDetermine.push(false);
-              console.log(this.bluredDetermine);
             }
+
             // let droneDir = getEnumDirection(this.velocity.getAngleFull());
             let photo = new Photo(
               { url: this.photos[this.photos.length - 1] },
@@ -301,7 +295,6 @@ class Drone {
         this.velocity.setAngle(this.angleTo(this.currentTarget.position));
       }
     }
-  }
 
     this.position.addTo(this.velocity);
     this.marker.setPosition(
@@ -317,7 +310,6 @@ class Drone {
       }
     });
   }
-
 
   findClosestPoint(ps) {
     let closestP = Infinity;

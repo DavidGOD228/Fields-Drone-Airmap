@@ -301,6 +301,7 @@ class Drone {
         this.velocity.setAngle(this.angleTo(this.currentTarget.position));
       }
     }
+  }
 
     this.position.addTo(this.velocity);
     this.marker.setPosition(
@@ -316,6 +317,7 @@ class Drone {
       }
     });
   }
+
 
   findClosestPoint(ps) {
     let closestP = Infinity;

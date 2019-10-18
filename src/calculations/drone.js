@@ -70,23 +70,23 @@ class Drone {
   addToPath(v) {
     // console.log(object);
     switch (v.type) {
-      case "MAKE_PHOTO":
+      case 'MAKE_PHOTO':
         this.path.push({
           position: v.point,
           xn: v.xn,
           yn: v.yn,
           reached: false,
           type: v.type
-        });   
+        });
         break;
-      case "BASE":
+      case 'BASE':
         this.path.push({
           position: v.point,
           reached: false,
           type: v.type
         });
         break;
-    
+
       default:
         break;
     }
@@ -98,14 +98,16 @@ class Drone {
 
   distributeComposedPaths() {
     // this.composedPaths.map(cp => this.path.push(...cp));
-    this.composedPaths.map(cp => cp.map(el => {
-      this.path.push({
-        position: el.point,
-        xn: el.xn,
-        yn: el.yn,
-        reached: false
-      });
-    }))
+    this.composedPaths.map(cp =>
+      cp.map(el => {
+        this.path.push({
+          position: el.point,
+          xn: el.xn,
+          yn: el.yn,
+          reached: false
+        });
+      })
+    );
   }
 
   angleTo(other) {
@@ -167,7 +169,7 @@ class Drone {
 
     settings.center = point.lat + ',' + point.lng;
     link = this.mashLink(base, settings);
-    
+
     return link;
   }
 
@@ -190,7 +192,7 @@ class Drone {
       if (this.savePhotos) {
         fs.closeSync(fs.openSync(this.folderPath + '/map.jpg', 'w'));
       }
-      
+
       console.log('this.path :', this.path);
       this.startCallback();
     }
@@ -212,8 +214,11 @@ class Drone {
           this.path[this.currentTargetIdx].reached = true;
 
           // MAKE A PHOTO
-          if(this.path[this.currentTargetIdx].type === "MAKE_PHOTO") {
-            console.log('this.currentTarget.position :', this.currentTarget.position);
+          if (this.path[this.currentTargetIdx].type === 'MAKE_PHOTO') {
+            console.log(
+              'this.currentTarget.position :',
+              this.currentTarget.position
+            );
             let photoLink = this.getPhotoLink(
               // vectorMapProxy(this.path[this.currentTargetIdx].position)
               vectorMapProxy(this.currentTarget.position)
@@ -226,8 +231,13 @@ class Drone {
               this.relativeCounter.toString().concat('.jpg');
             if (this.savePhotos) {
               Photo.downloadUrl(filePath, photoLink);
+              if (Math.floor(Math.random() * 2)) {
+                this.bluredDetermine.push(true);
+                Photo.blurUrl(photoLink, filePath);
+                console.log(this.photos);
+              } else this.bluredDetermine.push(false);
+              console.log(this.bluredDetermine);
             }
-
             // let droneDir = getEnumDirection(this.velocity.getAngleFull());
             let photo = new Photo(
               { url: this.photos[this.photos.length - 1] },

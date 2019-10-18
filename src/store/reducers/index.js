@@ -1,10 +1,12 @@
-import { combineReducers } from 'redux'
-import photosGalleryReducer from './photosGallery'
-import settingsReducer from './settings'
+import { combineReducers } from "redux";
+import photosGalleryReducer from "./photosGallery";
+import settingsReducer from "./settings";
+import droneParametersReducer from "./droneParameters";
 
 let rootReducer = combineReducers({
-  photos: photosGalleryReducer,
-  settings: settingsReducer
-})
+  photosData: photosGalleryReducer,
+  settings: settingsReducer,
+  droneParameters: droneParametersReducer
+});
 
-export default rootReducer
+export default rootReducer;

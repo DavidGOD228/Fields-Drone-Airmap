@@ -35,7 +35,6 @@ class Field {
 
     this.bounds = new Rectangle(tr, bl);
 
-    console.log("this.bounds :", this.bounds);
     this.width = this.bounds.tr.lat - this.bounds.tl.lat;
     this.height = this.bounds.tr.lng - this.bounds.br.lng;
 
@@ -83,7 +82,6 @@ class Field {
 
   isRectInside(rect, drawMakers = false) {
     let points = rect.toArray();
-    console.log("points :", points);
     let isInside = points.reduce((acc, cur) => {
       if (drawMakers) {
         let mark = new window.google.maps.Marker({
@@ -94,19 +92,10 @@ class Field {
           map: this.map
         });
       }
-      console.log("cur :", cur);
-      console.log("acc :", acc);
-      console.log("this.isPointInside(cur) :", this.isPointInside(cur));
       return acc || this.isPointInside(cur);
     }, false);
     // console.log('points :', points, isInside, [this.isPointInside(points[0]), this.isPointInside(points[1]), this.isPointInside(points[2]), this.isPointInside(points[3])]);
 
-    console.log(
-      "INSIDE?: ",
-      points.reduce((acc, cur) => {
-        return this.isPointInside(acc) || this.isPointInside(cur);
-      })
-    );
     return isInside;
 
     // return this.isPointInside(rect.center);
@@ -129,7 +118,6 @@ class Field {
   }
 
   async composeMap(images) {
-    console.log("COMPOSE MAP :", images);
     this.photosMap.mapImg = await Photo.compositeImagesAndSave(
       this.photosMap,
       images,
@@ -139,9 +127,6 @@ class Field {
   }
 
   async createMap() {
-    console.log("this.photosMap.nYPixels :", this.photosMap.nYPixels);
-    console.log("this.photosMap.nXPixels :", this.photosMap.nXPixels);
-
     this.photosMap.mapImg = await new Jimp(
       this.photosMap.nYPixels,
       this.photosMap.nXPixels,

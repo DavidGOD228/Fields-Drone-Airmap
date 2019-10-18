@@ -74,8 +74,6 @@ export const base64_encode = (file) => {
   // read binary data
   var bitmap = fs.readFileSync(file);
   // convert binary data to base64 encoded string
-  console.log('bitmap :', bitmap);
   let shit = new Buffer(bitmap).toString('base64');
-  console.log('shit :', shit);
   return shit;
 }

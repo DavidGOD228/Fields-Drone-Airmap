@@ -13,7 +13,6 @@ import sightengine from "sightengine";
 import Photo from "../calculations/Photo";
 
 let se = sightengine("540865617", "38b6kZYxVz6DyZLGv82G");
-console.log("sightengine :", se);
 
 class PhotosGallery extends Component {
   constructor(props) {
@@ -21,27 +20,24 @@ class PhotosGallery extends Component {
     this.state = {
       expandedIdx: -1
     };
-    console.log("this.props.photos :", this.props.photos);
 
-    (async () => {
-      console.log(
-        await se
-          .check(["properties"])
-          .set_url(
-            "https://opto.ca/sites/default/files/blurred_people_office_istock_67157357_medium.jpg"
-          )
-      );
-    })();
+    // (async () => {
+    //   console.log(
+    //     await se
+    //       .check(["properties"])
+    //       .set_url(
+    //         "https://opto.ca/sites/default/files/blurred_people_office_istock_67157357_medium.jpg"
+    //       )
+    //   );
+    // })();
   }
 
   onPhotoLoad(event) {
     const files = event.target.files;
 
     for (let i = 0; i < files.length; i++) {
-      console.log('files[i] :', files[i]);
       this.props.pushPhoto(new Photo({ url: URL.createObjectURL(files[i]) }));
     }
-    console.log("this.props.photos :", this.props.photos);
   }
 
   expandPhoto(idx) {
@@ -53,13 +49,12 @@ class PhotosGallery extends Component {
   }
 
   render() {
-    console.log("this.props :", this.props.photos.photos);
     return (
       <div className="relative">
         <ScrollTopBottomButton />
         <div className="photo-gallery-container">
-          {this.props.photos.photos.length > 0 &&
-            this.props.photos.photos.map((f, idx) => (
+          {this.props.photos.length > 0 &&
+            this.props.photos.map((f, idx) => (
               <div
                 className={`appear-anim photo-gallery-item ${this.state
                   .expandedIdx === idx && "photo-gallery-item-expanded"}`}
@@ -102,7 +97,7 @@ let mapDispatchToProps = dispatch => {
 
 let mapStateToProps = state => {
   return {
-    photos: state.photos
+    photos: state.photosData.photos
   };
 };
 

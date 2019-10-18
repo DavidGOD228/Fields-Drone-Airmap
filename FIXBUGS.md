@@ -15,7 +15,7 @@
   # task 6 
   [x]
 
-  # ADDITIONAL & BUGS
+  # ADDITIONAL & BUG
   [stas] fix a bug with making the last photo
   [stas] fix a bug with a program working only in top right quarter 
   [x] MAKE SETTINGS VIEW

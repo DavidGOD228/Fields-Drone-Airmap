@@ -1,25 +1,25 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import { connect } from "react-redux";
 import { compose } from "redux";
-import { Link } from 'react-router-dom';
-import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Link } from "react-router-dom";
+import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBars,
   faChevronRight,
   faChevronLeft
-} from '@fortawesome/free-solid-svg-icons';
+} from "@fortawesome/free-solid-svg-icons";
 
-import Sidebar from './Layout/Sidebar';
-import PhotosGallery from './Layout/PhotosGallery';
-import MyMap from './Layout/MyMap';
-import CreatedMap from './Layout/CreatedMap';
-import Settings from './Layout/Settings';
-import VariablesBlock from './VariablesBlock';
+import Sidebar from "./Layout/Sidebar";
+import PhotosGallery from "./Layout/PhotosGallery";
+import MyMap from "./Layout/MyMap";
+import CreatedMap from "./Layout/CreatedMap";
+import Settings from "./Layout/Settings";
+import VariablesBlock from "./VariablesBlock";
 
-import './index.css';
+import "./index.css";
 
-const fs = window.require('fs');
+const fs = window.require("fs");
 
 class App extends Component {
   constructor(props) {
@@ -47,16 +47,15 @@ class App extends Component {
   }
 
   render() {
-    // console.log('this.props :', this.props);
-
-    const { settings } = this.props;
-    const languageSettingVal = settings.find(el => el.label === "Language").value;
+    const { settings, droneParameters } = this.props;
+    const languageSettingVal = settings.find(el => el.label === "Language")
+      .value;
     return (
       <BrowserRouter>
         <div className="min-h-screen md:flex">
           <div
             className={`flex flex-col content-around flex-none bg-gray-800 text-white relative ${
-              this.state.sidebarOn ? 'w-full md:max-w-xs' : 'w-0'
+              this.state.sidebarOn ? "w-full md:max-w-xs" : "w-0"
             }`}
           >
             <Sidebar>
@@ -71,13 +70,15 @@ class App extends Component {
               </div>
 
               <div
-                className={`menu-container ${this.state.menuOn ? '' : 'h-0'}`}
+                className={`menu-container ${this.state.menuOn ? "" : "h-0"}`}
               >
                 <Link
                   to="/map"
                   className="menu-item flex flex-col justify-start items-center content-center text-center w-full bg-blue-700 py-2 cursor-pointer"
                 >
-                  {languageSettingVal === "English" ? "Map" : "Карта місцевості"}
+                  {languageSettingVal === "English"
+                    ? "Map"
+                    : "Карта місцевості"}
                 </Link>
                 <Link
                   to="/"
@@ -89,13 +90,17 @@ class App extends Component {
                   to="/created-map"
                   className="menu-item flex flex-col justify-start items-center content-center text-center w-full bg-blue-700 py-2 cursor-pointer"
                 >
-                  {languageSettingVal === "English" ? "Created map" : "Скомпонована карта"}
+                  {languageSettingVal === "English"
+                    ? "Created map"
+                    : "Скомпонована карта"}
                 </Link>
                 <Link
                   to="/settings"
                   className="menu-item flex flex-col justify-start items-center content-center text-center w-full bg-blue-700 py-2 cursor-pointer"
                 >
-                  {languageSettingVal === "English" ? "Settings" : "Налаштування"}
+                  {languageSettingVal === "English"
+                    ? "Settings"
+                    : "Налаштування"}
                 </Link>
               </div>
 
@@ -106,38 +111,14 @@ class App extends Component {
                 <FontAwesomeIcon className="mr-2" icon={faBars} />
               </div>
 
-              <VariablesBlock
-                vars={[
-                  {
-                    name: languageSettingVal === "English" ? 'Duration' : "Укр",
-                    val: '8.60',
-                    icon: 'coffee',
-                    measuredIn: 'minutes'
-                  },
-                  {
-                    name: languageSettingVal === "English" ? 'Resolution' : "Укр1",
-                    val: 1.7,
-                    icon: 'coffee',
-                    measuredIn: 'in/px'
-                  },
-                  {
-                    name: languageSettingVal === "English" ? 'Area' : "Укр2",
-                    val: 49,
-                    icon: 'coffee',
-                    measuredIn: 'acres'
-                  },
-                  {
-                    name: languageSettingVal === "English" ? 'Battery' : "Укр3",
-                    val: 3900,
-                    icon: 'coffee',
-                    measuredIn: 'mph'
-                  }
-                ]}
-              />
+              <VariablesBlock vars={droneParameters} />
 
               <Link to="/created-map">
                 <div>
-                  <img src={"data:image/png;base64," + this.props.mapPath} alt="No img yet"/>
+                  <img
+                    src={"data:image/png;base64," + this.props.mapPath}
+                    alt="No img yet"
+                  />
                 </div>
               </Link>
             </Sidebar>
@@ -164,13 +145,13 @@ let mapDispatchToProps = dispatch => {
 };
 
 let mapStateToProps = state => {
-  console.log('STATE :', state);
-  // console.log('state.mapPath :', state.photos.mapPath);
-  
+  console.log("STATE :", state);
+
   return {
-    mapPath: state.photos.mapPath,
+    mapPath: state.photosData.mapPath,
     photos: state.photos,
-    settings: state.settings.settings
+    settings: state.settings,
+    droneParameters: state.droneParameters
   };
 };
 

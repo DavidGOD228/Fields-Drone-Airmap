@@ -3,33 +3,29 @@ import { connect } from "react-redux";
 import { compose } from "redux";
 import { withRouter } from "react-router-dom";
 
-
 import { setSettingState } from "../store/actions/photosGallery";
 
-
 class Settings extends Component {
-  
-
   constructor(props) {
     super(props);
   }
 
   toggleChange(setting) {
     this.props.setSettingState(setting);
-    console.log("setting", setting);
   }
 
-  componentDidMount() {
-    console.log("this.state.settings", this.props.settings);
-  }
+  componentDidMount() {}
 
   render() {
     const { settings } = this.props;
-    const languageSettingVal = settings.find(el => el.label === "Language").value;
-    
+    const languageSettingVal = settings.find(el => el.label === "Language")
+      .value;
+
     return (
       <div className="container mx-auto  flex flex-col	 justify-center items-center">
-        <h1 className="text-6xl text-center font-hairline">{languageSettingVal === "English" ? "Settings" : "Налаштування"}</h1>
+        <h1 className="text-6xl text-center font-hairline">
+          {languageSettingVal === "English" ? "Settings" : "Налаштування"}
+        </h1>
         {/* <div className="container"> */}
         <ul className="container  my-10 px-64">
           {settings.map((setting, i) => {
@@ -55,9 +51,7 @@ class Settings extends Component {
                   </li>
                 );
               case "select":
-                return (
-                  <div>shit</div>
-                );
+                return <div>shit</div>;
               default:
                 break;
             }
@@ -75,14 +69,11 @@ let mapDispatchToProps = dispatch => {
 };
 
 let mapStateToProps = state => {
-  console.log('STATE :', state);
+  console.log("STATE :", state);
   // console.log('state.mapPath :', state.photos.mapPath);
   return {
-    settings: state.settings.settings
+    settings: state.settings
   };
 };
 
-export default connect(
-  mapStateToProps
-)(Settings);
-
+export default connect(mapStateToProps)(Settings);

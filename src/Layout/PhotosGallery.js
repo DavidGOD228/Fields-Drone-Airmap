@@ -18,16 +18,35 @@ class PhotosGallery extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      expandedIdx: -1
+      expandedIdx: -1,
+      blurPercentage: 0,
+      images: []
     };
   }
 
-  onPhotoLoad(event) {
+  async onPhotoLoad(event) {
     const files = event.target.files;
 
     for (let i = 0; i < files.length; i++) {
-      this.props.pushPhoto(new Photo({ url: URL.createObjectURL(files[i]) }));
+      console.log("files[i] :", files[i]);
+      this.props.pushPhoto(
+        new Photo(
+          { url: URL.createObjectURL(files[i]) },
+          {
+            sharpness: await Photo.getFileBlurFactor(files[i].path).then(
+              res => res
+            )
+          }
+        )
+      );
     }
+
+    console.log("this.props.photos :", this.props.photos);
+    // this.setState(state => {
+    //   return {
+    //     images: [...state.images, this.props]
+    //   };
+    // });
   }
 
   expandPhoto(idx) {
@@ -38,33 +57,58 @@ class PhotosGallery extends Component {
     });
   }
 
+  handlePercentageChange(event) {
+    this.setState({
+      blurPercentage: event.target.value
+    });
+    console.log("percentage: ", this.state.blurPercentage);
+    console.log("this.props.photos :", this.props.photos);
+  }
+
   render() {
     return (
       <div className="relative">
-        <div className="fileter-panel">
-          
+        <div
+          className="fileter-panel"
+          style={{ background: "#009fff54", padding: "5px" }}
+        >
+          <div
+            className="mb-4"
+            style={{ width: "200px", margin: "0", marginLeft: "20px" }}
+          >
+            <input
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="username"
+              type="text"
+              placeholder="Username"
+              value={this.state.blurPercentage}
+              onChange={this.handlePercentageChange.bind(this)}
+            />
+          </div>
         </div>
         <ScrollTopBottomButton />
         <div className="photo-gallery-container">
           {this.props.photos.length > 0 &&
-            this.props.photos.map((f, idx) => (
-              <div
-                className={`appear-anim photo-gallery-item ${this.state
-                  .expandedIdx === idx && "photo-gallery-item-expanded"}`}
-                key={f.url + Math.random() * Math.random()}
-              >
+            this.props.photos
+              .filter(el => el.sharpness > this.state.blurPercentage / 100)
+              .map((f, idx) => (
                 <div
-                  className="photo-expand-button icon-wrapper click-scale-down text-white"
-                  onClick={() => this.expandPhoto(idx)}
+                  className={`appear-anim photo-gallery-item ${this.state
+                    .expandedIdx === idx && "photo-gallery-item-expanded"}`}
+                  key={f.url + Math.random() * Math.random()}
                 >
-                  <FontAwesomeIcon
-                    icon={faExpandArrowsAlt}
-                    onClick={this.toggleTopBottom}
-                  />
+                  <div
+                    className="photo-expand-button icon-wrapper click-scale-down text-white"
+                    onClick={() => this.expandPhoto(idx)}
+                  >
+                    <FontAwesomeIcon
+                      icon={faExpandArrowsAlt}
+                      onClick={this.toggleTopBottom}
+                    />
+                  </div>
+                  <img src={f.url} />
                 </div>
-                <img src={f.url} />
-              </div>
-            ))}
+              ))}
           <div className="photo-gallery-item ">
             <input
               type="file"

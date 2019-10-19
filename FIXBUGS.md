@@ -38,5 +38,4 @@
 [STAS] make parameters inputs & sliders
 [STAS] create different drones and their setted up properties
 [STAS] make moving polygons work
-[] make
 [] abbility to chose whether drone should fly one time or two

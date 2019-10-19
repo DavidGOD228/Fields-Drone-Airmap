@@ -172,6 +172,10 @@ class Photo {
 //   console.log("shit: ", await Photo.getFileBlurFactor("./4out.jpg"));
 // })();
 
-// Photo.getFileBlurFactor('./4out.jpg').then(res => console.log('res :', res));
+// Photo.getFileBlurFactor('./Photos/Flight2/1.jpg').then(res => console.log('res :', res));
+
+// Photo.getFileBlurFactor(
+//   `F:\\Programming\\WEB\\_MY_PROJECTS_\\School_Shit\\DroneProject\\drone-app\\Photos\\Flight4\\1.jpg`
+// ).then(res => console.log("res :", res));
 
 export default Photo;

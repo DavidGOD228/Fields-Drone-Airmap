@@ -4,14 +4,26 @@ let initialState = [
     name: "Час польоту",
     val: 49,
     icon: "coffee",
-    measuredIn: "acres"
+    measuredIn: "acres",
+    type: "text"
   },
   {
     // name: languageSettingVal === "English" ? "Battery" : "Укр3",
     name: "Заряд дрона",
     val: 3900,
     icon: "coffee",
-    measuredIn: "mph"
+    measuredIn: "mph",
+    type: "text"
+  },
+  {
+    // name: languageSettingVal === "English" ? "Battery" : "Укр3",
+    name: "Максимальна висота",
+    min: 0,
+    max: 500,
+    val: 300,
+    icon: "coffee",
+    measuredIn: "m",
+    type: "slider"
   }
 ];
 

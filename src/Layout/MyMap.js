@@ -530,7 +530,7 @@ class MyMap extends Component {
           className="start-flight-button click-scale-down bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
           style={{ display: readyForStart ? "block" : "none" }}
         >
-          Start
+          Старт
         </button>
 
         <div

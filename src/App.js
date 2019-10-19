@@ -15,6 +15,7 @@ import PhotosGallery from "./Layout/PhotosGallery";
 import MyMap from "./Layout/MyMap";
 import CreatedMap from "./Layout/CreatedMap";
 import Settings from "./Layout/Settings";
+import CompareImages from "./Layout/CompareImages";
 import VariablesBlock from "./VariablesBlock";
 
 import "./index.css";
@@ -104,6 +105,14 @@ class App extends Component {
                     ? "Settings"
                     : "Налаштування"}
                 </Link>
+                <Link
+                  to="/compare-images"
+                  className="menu-item flex flex-col justify-start items-center content-center text-center w-full bg-blue-700 py-2 cursor-pointer"
+                >
+                  {languageSettingVal === "English"
+                    ? "Compare Images"
+                    : "Порівняти картинки"}
+                </Link>
               </div>
 
               <div
@@ -131,6 +140,7 @@ class App extends Component {
               <Route exact path="/map" component={MyMap} />
               <Route exact path="/created-map" component={CreatedMap} />
               <Route exact path="/settings" component={Settings} />
+              <Route exact path="/compare-images" component={CompareImages} />
             </Switch>
           </div>
         </div>

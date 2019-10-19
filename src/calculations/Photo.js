@@ -4,7 +4,12 @@ const mergeImg = window.require("merge-img");
 const mergeImages = window.require("merge-images");
 const Jimp = window.require("jimp");
 // const resemble = window.require("resemblejs");
-const compare = require("resemblejs");
+const { compare } = require("resemblejs");
+var looksSame = window.require("looks-same");
+
+// const resemble = require("../start").resemble;
+// console.log("compare :", resemble);
+console.log("compare :", compare);
 
 const fs = window.require("fs");
 const http = window.require("http");
@@ -207,10 +212,62 @@ class Photo {
   //       // res.render('compare');
   //     });
   // }
+  static comparePixelMatch(
+    path1,
+    path2,
+    comparePath,
+    { tolerance, antialiasingTolerance, ignoreAntialiasing, ignoreCaret }
+  ) {
+    looksSame.createDiff(
+      {
+        reference: path1,
+        current: path2,
+        diff: comparePath,
+        highlightColor: "#ff00ff", // color to highlight the differences
+        strict: false, // strict comparsion
+        tolerance: tolerance || 20,
+        antialiasingTolerance: antialiasingTolerance || 0,
+        ignoreAntialiasing: ignoreAntialiasing || true, // ignore antialising by default
+        ignoreCaret: ignoreCaret || true // ignore caret by default
+      },
+      error => {}
+    );
+  }
 }
+
+// Photo.comparePixelMatch(
+//   "./Photos/Flight20/4.jpg",
+//   "./Photos/Flight20/2.jpg",
+//   "./Photos/Flight20/shit.jpg"
+// );
 
 // Photo.comparingImages("./Photos/Flight20/4.jpg", "./Photos/Flight20/4.jpg");
 // Photo.resembleCompare("./Photos/Flight20/4.jpg", "./Photos/Flight20/4.jpg");
+
+// function getDiff(image1, image2) {
+//   const options = {
+//     returnEarlyThreshold: 5
+//   };
+
+//   compare(image1, image2, options, function(err, data) {
+//     if (err) {
+//       console.log("An error!");
+//     } else {
+//       console.log(data);
+//     }
+//   });
+// }
+
+// getDiff("./Photos/Flight20/4.jpg", "./Photos/Flight20/4.jpg");
+
+// looksSame(
+//   "./Photos/Flight20/4.jpg",
+//   "./Photos/Flight20/3.jpg",
+//   (error, { equal }) => {
+//     console.log("equal :", equal);
+//     // equal will be true, if images looks the same
+//   }
+// );
 
 (async () => {
   let val = await Photo.uploadPhoto("./Photos/Flight20/4.jpg");

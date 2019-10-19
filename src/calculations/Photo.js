@@ -1,14 +1,14 @@
-const Rembrandt = require('rembrandt/build/browser');
-const mergeImg = window.require('merge-img');
-const mergeImages = window.require('merge-images');
-const Jimp = window.require('jimp');
+const Rembrandt = require("rembrandt/build/browser");
+const mergeImg = window.require("merge-img");
+const mergeImages = window.require("merge-images");
+const Jimp = window.require("jimp");
 
-const fs = window.require('fs');
-const http = window.require('http');
-const https = window.require('https');
-const path = window.require('path');
+const fs = window.require("fs");
+const http = window.require("http");
+const https = window.require("https");
+const path = window.require("path");
 
-const se = window.require('sightengine')('540865617', '38b6kZYxVz6DyZLGv82G');
+const se = window.require("sightengine")("540865617", "38b6kZYxVz6DyZLGv82G");
 
 class Photo {
   constructor({ url }, additional) {
@@ -39,7 +39,6 @@ class Photo {
   }
 
   static async compositeImages(canvas, img) {
-
     let j = await Jimp.read(img.src);
     canvas.composite(j, img.x, img.y);
     return canvas;
@@ -48,14 +47,14 @@ class Photo {
   static async uploadIMG(filepathA) {
     var url;
     var file = fs.readFileSync(filepathA);
-    var base64 = new Buffer(file).toString('base64');
+    var base64 = new Buffer(file).toString("base64");
     console.log(file, base64);
     fetch(
-      'https://api.imgbb.com/' +
+      "https://api.imgbb.com/" +
         file.filename +
-        '/' +
+        "/" +
         base64 +
-        '?key=06706fe2cc8c18bdcce5f4424f86a038'
+        "?key=06706fe2cc8c18bdcce5f4424f86a038"
     )
       .then(res => res.json())
       .then(
@@ -70,33 +69,52 @@ class Photo {
   }
 
   static async inverceColor(canvas) {
-    canvas.flip(false, true);
     canvas.invert();
     canvas.color([
-      { apply: 'red', params: [100] },
-      { apply: 'green', params: [-100] },
-      { apply: 'blue', params: [-100] }
+      { apply: "red", params: [100] },
+      { apply: "green", params: [-100] },
+      { apply: "blue", params: [-100] }
     ]);
     canvas.brightness(-0.4);
     canvas.contrast(0.3);
+
+    return canvas;
   }
 
-  static async compositeImagesAndSave(mainImg, imgs, outputPath) {
+  static async compositeImagesAndSave(
+    mainImg,
+    imgs,
+    outputPath,
+    invertedMapPath
+  ) {
     let canvas = mainImg.mapImg;
     let jimps = [];
 
     // FIXME: -1 is not right
-    for (let i = 0; i < imgs.length - 1; i++) {
+    for (let i = 0; i < imgs.length; i++) {
       let j = await Jimp.read(imgs[i].src);
       jimps.push(j);
     }
     for (let [idx, j] of jimps.entries()) {
-      canvas.composite(j, imgs[idx].x, imgs[idx].y);
+      let y = mainImg.nXPixels - imgs[idx].y - mainImg.yDimention;
+      if (imgs[idx].reversed) {
+        console.log(
+          "mainImg.nXPixels - imgs[idx].x, mainImg.nXPixels, imgs[idx].x :",
+          mainImg.nYPixels - imgs[idx].x,
+          mainImg.nYPixels,
+          imgs[idx].x
+        );
+        canvas.composite(j, mainImg.nYPixels - imgs[idx].x, y);
+      } else {
+        canvas.composite(j, imgs[idx].x, y);
+      }
     }
     //this.inverceColor(canvas);
 
-    canvas.write(outputPath, () => console.log('DONE COMPOSING'));
-
+    canvas.write(outputPath, () => console.log("DONE COMPOSING"));
+    let inverted = await Photo.inverceColor(canvas);
+    inverted.write(invertedMapPath, () => console.log("DONE COMPOSING"));
+    // console.log("canvas :", canvas);
     return canvas;
   }
 
@@ -128,9 +146,9 @@ class Photo {
     rembrandt
       .compare()
       .then(result => {
-        console.log('Passed:', result.passed);
-        console.log('Difference:', (result.threshold * 100).toFixed(2), '%');
-        console.log('Composition image buffer:', result.compositionImage);
+        console.log("Passed:", result.passed);
+        console.log("Difference:", (result.threshold * 100).toFixed(2), "%");
+        console.log("Composition image buffer:", result.compositionImage);
       })
       .catch(err => {
         console.error(err);
@@ -139,14 +157,13 @@ class Photo {
 
   static getFileBlurFactor(filepath) {
     return se
-      .check(['properties'])
+      .check(["properties"])
       .set_file(filepath)
       .then(function(result) {
-
         return result.sharpness;
       })
       .catch(function(err) {
-        console.log('err :', err);
+        console.log("err :", err);
       });
   }
 }
@@ -155,6 +172,6 @@ class Photo {
 //   console.log("shit: ", await Photo.getFileBlurFactor("./4out.jpg"));
 // })();
 
-Photo.getFileBlurFactor('./4out.jpg').then(res => console.log('res :', res));
+// Photo.getFileBlurFactor('./4out.jpg').then(res => console.log('res :', res));
 
 export default Photo;

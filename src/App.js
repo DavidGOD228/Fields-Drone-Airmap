@@ -84,7 +84,9 @@ class App extends Component {
                   to="/"
                   className="menu-item flex flex-col justify-start items-center content-center text-center w-full bg-blue-700 py-2 cursor-pointer"
                 >
-                  {languageSettingVal === "English" ? "Photos" : "Фото"}
+                  {languageSettingVal === "English"
+                    ? "Photos"
+                    : "Загрузити фото"}
                 </Link>
                 <Link
                   to="/created-map"
@@ -145,10 +147,10 @@ let mapDispatchToProps = dispatch => {
 };
 
 let mapStateToProps = state => {
-  console.log("STATE :", state);
+  // console.log("STATE :", state);
 
   return {
-    mapPath: state.photosData.mapPath,
+    mapPath: state.map.mapPath,
     photos: state.photos,
     settings: state.settings,
     droneParameters: state.droneParameters

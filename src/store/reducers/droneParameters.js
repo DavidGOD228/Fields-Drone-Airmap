@@ -18,17 +18,16 @@ let initialState = [
 let photoReducer = (state = initialState, action) => {
   switch (action.type) {
     case "UPDATE_DRONE_PARAMETER":
-      let changedArr = [...state];
-      let toBeChangedIdx = changedArr.findIndex(
-        el => el.name === action.keyVal.name
-      );
-      console.log("changedArr :", changedArr);
-      console.log("toBeChangedIdx :", toBeChangedIdx);
-      console.log("action.keyVal :", action.keyVal);
-      // changedArr[toBeChangedIdx] = action.changedArr;
-      changedArr[toBeChangedIdx].name = action.keyVal.name;
-      changedArr[toBeChangedIdx].val = action.keyVal.val;
-      return [...changedArr];
+      return state.map((el, idx) => {
+        if (el.name === action.keyVal.name) {
+          return {
+            ...el,
+            ...action.keyVal
+          };
+        } else {
+          return el;
+        }
+      });
     default:
       return state;
   }

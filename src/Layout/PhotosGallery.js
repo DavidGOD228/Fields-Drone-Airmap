@@ -20,16 +20,6 @@ class PhotosGallery extends Component {
     this.state = {
       expandedIdx: -1
     };
-
-    // (async () => {
-    //   console.log(
-    //     await se
-    //       .check(["properties"])
-    //       .set_url(
-    //         "https://opto.ca/sites/default/files/blurred_people_office_istock_67157357_medium.jpg"
-    //       )
-    //   );
-    // })();
   }
 
   onPhotoLoad(event) {
@@ -51,6 +41,9 @@ class PhotosGallery extends Component {
   render() {
     return (
       <div className="relative">
+        <div className="fileter-panel">
+          
+        </div>
         <ScrollTopBottomButton />
         <div className="photo-gallery-container">
           {this.props.photos.length > 0 &&
@@ -97,7 +90,7 @@ let mapDispatchToProps = dispatch => {
 
 let mapStateToProps = state => {
   return {
-    photos: state.photosData.photos
+    photos: state.photos
   };
 };
 

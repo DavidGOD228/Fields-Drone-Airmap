@@ -121,9 +121,12 @@ class Field {
     this.photosMap.mapImg = await Photo.compositeImagesAndSave(
       this.photosMap,
       images,
-      this.photosMap.path
+      this.photosMap.path,
+      this.photosMap.invertedMapPath
     );
-    return new Promise(resolve => resolve());
+
+    // console.log("this.photosMap.mapImg :", this.photosMap.mapImg);
+    return new Promise(resolve => resolve(this.photosMap.mapImg));
   }
 
   async createMap() {
@@ -133,6 +136,7 @@ class Field {
       0x0
     );
     this.photosMap.path = this.folderPath + "/output.jpg";
+    this.photosMap.invertedMapPath = this.folderPath + "/inverted.jpg";
   }
 
   distributeOnSquares() {
@@ -140,8 +144,13 @@ class Field {
       nLngSquares = this.height / (this.squareYr * 2);
     // nLngSquares = Math.ceil(this.height / ((this.squareRadius * 2) / getLngFactor(nLatSquares)));
 
-    this.photosMap.nXPixels = nLatSquares * this.dronePhotoDimentions.x;
-    this.photosMap.nYPixels = nLngSquares * this.dronePhotoDimentions.y;
+    console.log("nLatSquares :", nLatSquares);
+    this.photosMap.xDimention = this.dronePhotoDimentions.x;
+    this.photosMap.yDimention = this.dronePhotoDimentions.y;
+    this.photosMap.nXPixels =
+      Math.ceil(nLatSquares) * this.dronePhotoDimentions.x;
+    this.photosMap.nYPixels =
+      Math.ceil(nLngSquares) * this.dronePhotoDimentions.y;
 
     this.squaresArray = Array.from({ length: nLatSquares + 2 }, (el, x) =>
       Array.from(

@@ -77,7 +77,8 @@ class Drone {
           xn: v.xn,
           yn: v.yn,
           reached: false,
-          type: v.type
+          type: v.type,
+          reversed: v.reversed
         });
         break;
       case "BASE":
@@ -248,7 +249,8 @@ class Drone {
               {
                 x: this.currentTarget.xn * this.field.dronePhotoDimentions.x,
                 y: this.currentTarget.yn * this.field.dronePhotoDimentions.y,
-                src: filePath
+                src: filePath,
+                reversed: this.currentTarget.reversed
               }
             );
             this.photoMapObjs.push(photo);
@@ -282,10 +284,23 @@ class Drone {
           clearInterval(this.flightInterval);
           clearInterval(this.secondsSpentInterval);
 
-          this.field.composeMap(this.photoMapObjs).then(() => {
+          console.log("this.photoMapObjs :", this.photoMapObjs);
+          console.log("this.photos :", this.photos);
+          this.field.composeMap(this.photoMapObjs).then(canvasImg => {
+            // console.log("canvasImg :", canvasImg);
+            this.setJimpMap(canvasImg);
             fs.readFile(this.field.photosMap.path, (err, data) => {
               let b64 = data.toString("base64");
               this.setMapPath(b64);
+            });
+            fs.readFile(this.field.photosMap.invertedMapPath, (err, data) => {
+              console.log(
+                "this.field.photosMap.invertedMapPath :",
+                this.field.photosMap.invertedMapPath
+              );
+              let b64 = data.toString("base64");
+              console.log("b64 :", b64);
+              this.setInvertedPath(b64);
             });
           });
           this.endCallback();

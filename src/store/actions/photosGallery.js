@@ -11,10 +11,3 @@ export const pushPhoto = photo => {
     photo
   }
 }
-
-export const setMapPath = mapPath => {
-  return {
-    type: "SET_MAP_PATH",
-    mapPath
-  }
-}

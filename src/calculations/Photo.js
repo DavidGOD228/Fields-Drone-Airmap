@@ -69,7 +69,6 @@ class Photo {
   }
 
   static async inverceColor(canvas) {
-    canvas.flip(false, true);
     canvas.invert();
     canvas.color([
       { apply: "red", params: [100] },
@@ -78,24 +77,44 @@ class Photo {
     ]);
     canvas.brightness(-0.4);
     canvas.contrast(0.3);
+
+    return canvas;
   }
 
-  static async compositeImagesAndSave(mainImg, imgs, outputPath) {
+  static async compositeImagesAndSave(
+    mainImg,
+    imgs,
+    outputPath,
+    invertedMapPath
+  ) {
     let canvas = mainImg.mapImg;
     let jimps = [];
 
     // FIXME: -1 is not right
-    for (let i = 0; i < imgs.length - 1; i++) {
+    for (let i = 0; i < imgs.length; i++) {
       let j = await Jimp.read(imgs[i].src);
       jimps.push(j);
     }
     for (let [idx, j] of jimps.entries()) {
-      canvas.composite(j, imgs[idx].x, imgs[idx].y);
+      let y = mainImg.nXPixels - imgs[idx].y - mainImg.yDimention;
+      if (imgs[idx].reversed) {
+        console.log(
+          "mainImg.nXPixels - imgs[idx].x, mainImg.nXPixels, imgs[idx].x :",
+          mainImg.nYPixels - imgs[idx].x,
+          mainImg.nYPixels,
+          imgs[idx].x
+        );
+        canvas.composite(j, mainImg.nYPixels - imgs[idx].x, y);
+      } else {
+        canvas.composite(j, imgs[idx].x, y);
+      }
     }
     //this.inverceColor(canvas);
 
     canvas.write(outputPath, () => console.log("DONE COMPOSING"));
-
+    let inverted = await Photo.inverceColor(canvas);
+    inverted.write(invertedMapPath, () => console.log("DONE COMPOSING"));
+    // console.log("canvas :", canvas);
     return canvas;
   }
 

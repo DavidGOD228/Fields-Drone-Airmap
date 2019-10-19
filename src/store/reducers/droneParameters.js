@@ -28,17 +28,6 @@ let photoReducer = (state = initialState, action) => {
           return el;
         }
       });
-    // let changedArr = [...state];
-    // let toBeChangedIdx = changedArr.findIndex(
-    //   el => el.name === action.keyVal.name
-    // );
-    // console.log("changedArr :", changedArr);
-    // console.log("toBeChangedIdx :", toBeChangedIdx);
-    // console.log("action.keyVal :", action.keyVal);
-    // // changedArr[toBeChangedIdx] = action.changedArr;
-    // changedArr[toBeChangedIdx].name = action.keyVal.name;
-    // changedArr[toBeChangedIdx].val = action.keyVal.val;
-    // return [...changedArr];
     default:
       return state;
   }

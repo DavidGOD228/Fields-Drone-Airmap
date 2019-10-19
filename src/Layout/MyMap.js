@@ -19,7 +19,8 @@ import {
   vectorToMap,
   getLngFactor
 } from "../calculations/helpers";
-import { pushPhoto, setMapPath } from "../store/actions/photosGallery";
+import { pushPhoto } from "../store/actions/photosGallery";
+import { setMapPath, setJimpMap, setInvertedPath } from "../store/actions/map";
 import { updateDroneParameter } from "../store/actions/droneParameters";
 import Photo from "../calculations/Photo";
 import { scrollDown } from "../components/helpers";
@@ -299,8 +300,8 @@ class MyMap extends Component {
 
         console.log("Drone :", Drone);
         let droneDim = 200;
-        //         25.497646938259912 - 25.498987938259912
         // -0.0013410000000000366
+        // 0.00134999999999863
 
         let droneMaxHeight = 0.000005 * droneDim;
         // let droneMaxHeight = 0.0013410000000000366 ;
@@ -313,23 +314,16 @@ class MyMap extends Component {
             overlayRadiusLat: droneMaxHeight / 2,
             overlayRadiusLng:
               droneMaxHeight / 2 / getLngFactor(marker.getPosition().lat()),
-            // 0.0002 / Math.cos(marker.getPosition().lat() * 0.01745),
             direction: Math.PI / 2,
-
             maxHeight: droneMaxHeight,
-            // focusDistance: 0.01,
-            // sensorA: 0.001,
-            // sensorB: 0.05,
-            // charge: 10000000,
-            // flightCosts: 0,
-            // photoCosts: 0,
-
             batteryCharge: 2000,
             batteryPerPhoto: 20,
             batteryPerMove: 10,
             pushPhoto: this.props.pushPhoto,
             updateDroneParameter: this.props.updateDroneParameter,
             setMapPath: this.props.setMapPath,
+            setJimpMap: this.props.setJimpMap,
+            setInvertedPath: this.props.setInvertedPath,
             folderPath: folderPath,
             savePhotos: savePhotos,
             dronePhotoDimentions: {
@@ -426,9 +420,6 @@ class MyMap extends Component {
     var path = poly.getPath();
     path.push(latLng);
     var encodeString = window.google.maps.geometry.encoding.encodePath(path);
-    // if (encodeString) {
-    //   document.getElementById('encoded-polyline').value = encodeString;
-    // }
   }
 
   async startFlight() {
@@ -453,6 +444,7 @@ class MyMap extends Component {
 
     let { field, drone, base } = this.state;
     field.setRadiuses(drone.overlayRadiusLat, drone.overlayRadiusLng);
+    // field.setRadiuses(0.00134999999999863, 0.00134999999999863);
     field.distributeOnSquares();
     await field.createMap();
     this.state.drone.setField(field);
@@ -471,8 +463,9 @@ class MyMap extends Component {
 
     console.log("field.SquaresArray :", field.SquaresArray);
     for (let [y, p] of field.squaresArray.entries()) {
-      if (y % 2 !== 0) {
-        // p = p.reverse();
+      let reversed = y % 2 !== 0;
+      if (reversed) {
+        p = p.reverse();
         // let copiedP = p.reverse();
         // for(let i = 0; i < arrr.length; i++) {
         //   composedArr.push({ p: arrReversed[i].p, ...arrr[i]})
@@ -495,7 +488,8 @@ class MyMap extends Component {
             point: vpp,
             xn: x,
             yn: y,
-            type: "MAKE_PHOTO"
+            type: "MAKE_PHOTO",
+            reversed
           };
           drone.addToPath(pathNode);
           composedPath.push(pathNode);
@@ -560,8 +554,8 @@ class MyMap extends Component {
           {this.props.photos.length > 0 &&
             this.props.photos.map((f, idx) => (
               <div
-                className={`appear-anim photo-gallery-item  ${this.state
-                  .expandedIdx === idx && "photo-gallery-item-expanded"}`}
+                className={`photo-gallery-item  ${this.state.expandedIdx ===
+                  idx && "photo-gallery-item-expanded"}`}
                 key={Math.random() * Math.random()}
                 // key={f.url + Math.random() * Math.random()}
               >
@@ -587,15 +581,17 @@ let mapDispatchToProps = dispatch => {
   return {
     pushPhoto: photo => dispatch(pushPhoto(photo)),
     setMapPath: mapPath => dispatch(setMapPath(mapPath)),
+    setJimpMap: mapPath => dispatch(setJimpMap(mapPath)),
+    setInvertedPath: mapPath => dispatch(setInvertedPath(mapPath)),
     updateDroneParameter: (name, val) =>
       dispatch(updateDroneParameter(name, val))
   };
 };
 
 let mapStateToProps = state => {
-  console.log("SHIT STATE :", state);
+  // console.log("SHIT STATE :", state);
   return {
-    photos: state.photosData.photos,
+    photos: state.photos,
     settings: state.settings
   };
 };

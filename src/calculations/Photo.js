@@ -1,4 +1,5 @@
-const Rembrandt = require("rembrandt/build/browser");
+// const Rembrandt = require("rembrandt/build/browser");
+import Rembrandt from "rembrandt";
 const mergeImg = window.require("merge-img");
 const mergeImages = window.require("merge-images");
 const Jimp = window.require("jimp");
@@ -7,9 +8,13 @@ const fs = window.require("fs");
 const http = window.require("http");
 const https = window.require("https");
 const path = window.require("path");
+const util = window.require("util");
+
 var exec = window.require("child_process").exec;
 
 const se = window.require("sightengine")("540865617", "38b6kZYxVz6DyZLGv82G");
+
+const execOperation = util.promisify(exec);
 
 class Photo {
   constructor({ url }, additional) {
@@ -91,7 +96,6 @@ class Photo {
     let canvas = mainImg.mapImg;
     let jimps = [];
 
-    // FIXME: -1 is not right
     for (let i = 0; i < imgs.length; i++) {
       let j = await Jimp.read(imgs[i].src);
       jimps.push(j);
@@ -110,7 +114,6 @@ class Photo {
         canvas.composite(j, imgs[idx].x, y);
       }
     }
-    //this.inverceColor(canvas);
 
     canvas.write(outputPath, () => console.log("DONE COMPOSING"));
     let inverted = await Photo.inverceColor(canvas);
@@ -143,6 +146,7 @@ class Photo {
       renderComposition: true, // Should Rembrandt render a composition image?
       compositionMaskColor: Rembrandt.Color.RED // Color of unmatched pixels
     });
+    console.log("rembrandt :", rembrandt);
 
     rembrandt
       .compare()
@@ -169,31 +173,17 @@ class Photo {
   }
 
   static uploadPhoto(path) {
-    exec(`imgur ${path}`, (err, stdout, stderr) => {
-      console.log("stdout: ", stdout);
-      console.log("stdout: ", err);
-      console.log("stdout: ", stderr);
-      // browser.close();
+    return execOperation(`imgur ${path}`).then((one, two, three) => {
+      return one.stdout;
     });
-    // let link = await exec(`imgur ${path}`);
-    // return link;
   }
 }
-// (async () => {
-//   console.log(await Photo.uploadPhoto("../../Photos/Flight1/10.jpg"));
-// })();
-// Photo.uploadPhoto("../../Photos/Flight1/10.jpg");
-// Photo.uploadPhoto("/Photos/Flight23/8.jpg");
-// console.log("new File() :", new File("/Photos/Flight23/8.jpg"));
-// console.log("__dirname :", process.cwd());
-// (async () => {
-//   console.log("shit: ", await Photo.getFileBlurFactor("./4out.jpg"));
-// })();
 
-// Photo.getFileBlurFactor('./Photos/Flight2/1.jpg').then(res => console.log('res :', res));
-
-// Photo.getFileBlurFactor(
-//   `F:\\Programming\\WEB\\_MY_PROJECTS_\\School_Shit\\DroneProject\\drone-app\\Photos\\Flight4\\1.jpg`
-// ).then(res => console.log("res :", res));
+(async () => {
+  let val = await Photo.uploadPhoto("./Photos/Flight20/4.jpg");
+  console.log("val :", val);
+  // Photo.comparingImages(val, val);
+  Photo.comparingImages("./Photos/Flight20/4.jpg", "./Photos/Flight20/4.jpg");
+})();
 
 export default Photo;

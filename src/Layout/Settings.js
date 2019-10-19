@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { compose } from "redux";
 import { withRouter } from "react-router-dom";
 
-import { setSettingState } from "../store/actions/photosGallery";
+import { setSettingState } from "../store/actions/settings";
 
 class Settings extends Component {
   constructor(props) {

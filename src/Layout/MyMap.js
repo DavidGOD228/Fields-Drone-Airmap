@@ -297,7 +297,7 @@ class MyMap extends Component {
         console.log("Drone :", Drone);
         let droneDim = 500;
         // -0.0013410000000000366
-        let plusFactor = 0.00134999999999863;
+        let distBetweenTwoCenters = 0.00134999999999863;
 
         let droneMaxHeight = this.props.droneParameters.find(
           el => el.name === "Максимальна висота"
@@ -313,12 +313,17 @@ class MyMap extends Component {
             // overlayRadiusLat: droneMaxHeight / 2,
             // overlayRadiusLng:
             //   droneMaxHeight / 2 / getLngFactor(marker.getPosition().lat()),
-            overlayRadiusLat: plusFactor / 2,
+            overlayRadiusLat: distBetweenTwoCenters / 2,
             overlayRadiusLng:
-              plusFactor / 2 / getLngFactor(marker.getPosition().lat()),
+              distBetweenTwoCenters /
+              2 /
+              getLngFactor(marker.getPosition().lat()),
 
-            ovelayPhotoRadiusLat: plusFactor,
-            ovelayPhotoRadiusLng: plusFactor / getLngFactor(marker.getPosition().lat()),
+            ovelayPhotoRadiusLat: distBetweenTwoCenters / 2,
+            ovelayPhotoRadiusLng:
+              distBetweenTwoCenters /
+              2 /
+              getLngFactor(marker.getPosition().lat()),
             direction: Math.PI / 2,
             maxHeight: droneMaxHeight,
             batteryCharge: 2000,

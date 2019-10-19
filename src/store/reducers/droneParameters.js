@@ -4,7 +4,7 @@ let initialState = [
     name: "Час польоту",
     val: 49,
     icon: "coffee",
-    measuredIn: "acres",
+    measuredIn: "сек",
     type: "text"
   },
   {
@@ -12,7 +12,7 @@ let initialState = [
     name: "Заряд дрона",
     val: 3900,
     icon: "coffee",
-    measuredIn: "mph",
+    measuredIn: "мч",
     type: "text"
   },
   {
@@ -22,7 +22,7 @@ let initialState = [
     max: 500,
     val: 300,
     icon: "coffee",
-    measuredIn: "m",
+    measuredIn: "м",
     type: "slider"
   }
 ];

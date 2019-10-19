@@ -3,6 +3,8 @@ import Rembrandt from "rembrandt";
 const mergeImg = window.require("merge-img");
 const mergeImages = window.require("merge-images");
 const Jimp = window.require("jimp");
+// const resemble = window.require("resemblejs");
+const compare = require("resemblejs");
 
 const fs = window.require("fs");
 const http = window.require("http");
@@ -133,9 +135,10 @@ class Photo {
   }
 
   static async comparingImages(filepathA, filepathB) {
-    var tempA = filepathA;
-    var tempB = filepathB;
+    var tempA = fs.readFileSync(filepathA);
+    var tempB = fs.readFileSync(filepathB);
 
+    console.log("tempA, tempB :", tempA, tempB);
     const rembrandt = new Rembrandt({
       imageA: tempA,
       imageB: tempB,
@@ -147,7 +150,7 @@ class Photo {
       compositionMaskColor: Rembrandt.Color.RED // Color of unmatched pixels
     });
     console.log("rembrandt :", rembrandt);
-
+    // console.log("rembrandt.compare() :", rembrandt.compare());
     rembrandt
       .compare()
       .then(result => {
@@ -177,13 +180,45 @@ class Photo {
       return one.stdout;
     });
   }
+
+  // static resembleCompare(path1, path2) {
+  //   resemble.outputSettings({
+  //     largeImageThreshold: 0
+  //   });
+  //   var diff = resemble(path1)
+  //     .compareTo(path2)
+  //     .ignoreColors()
+  //     .onComplete(data => {
+  //       console.log(data);
+  //       // var png = data.getDiffImage();
+  //       // var buf = new Buffer([]);
+  //       // var strm = png.pack();
+  //       // strm.on("data", function(dat) {
+  //       //   buf = Buffer.concat([buf, dat]);
+  //       // });
+  //       // strm.on("end", function() {
+  //       //   fs.writeFile("diff.png", buf, null, function(err) {
+  //       //     if (err) {
+  //       //       throw "error writing file: " + err;
+  //       //     }
+  //       //     console.log("file written");
+  //       //   });
+  //       // });
+  //       // res.render('compare');
+  //     });
+  // }
 }
+
+// Photo.comparingImages("./Photos/Flight20/4.jpg", "./Photos/Flight20/4.jpg");
+// Photo.resembleCompare("./Photos/Flight20/4.jpg", "./Photos/Flight20/4.jpg");
 
 (async () => {
   let val = await Photo.uploadPhoto("./Photos/Flight20/4.jpg");
   console.log("val :", val);
   // Photo.comparingImages(val, val);
-  Photo.comparingImages("./Photos/Flight20/4.jpg", "./Photos/Flight20/4.jpg");
+  // Photo.comparingImages("./Photos/Flight20/4.jpg", "./Photos/Flight20/4.jpg");
 })();
+
+// Photo.compareImages("./Photos/Flight20/4.jpg", "./Photos/Flight20/4.jpg");
 
 export default Photo;

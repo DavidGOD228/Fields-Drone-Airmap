@@ -202,10 +202,6 @@ class MyMap extends Component {
         let field = new Field({
           polyArr,
           map,
-          // dronePhotoDimentions: {
-          //   x: 420,
-          //   y: 420
-          // },
           dronePhotoDimentions: this.state.drone.dronePhotoDimentions,
           folderPath: folderPath,
           drawSquares: false,
@@ -299,11 +295,14 @@ class MyMap extends Component {
         );
 
         console.log("Drone :", Drone);
-        let droneDim = 200;
+        let droneDim = 500;
         // -0.0013410000000000366
-        // 0.00134999999999863
+        let plusFactor = 0.00134999999999863;
 
-        let droneMaxHeight = 0.000005 * droneDim;
+        let droneMaxHeight = this.props.droneParameters.find(
+          el => el.name === "Максимальна висота"
+        ).val;
+        // let droneMaxHeight = 0.000005 * droneDim;
         // let droneMaxHeight = 0.0013410000000000366 ;
 
         this.state.drone = new Drone(
@@ -311,9 +310,15 @@ class MyMap extends Component {
             position: pos,
             // speed: 0.00004,
             speed: 0.00002,
-            overlayRadiusLat: droneMaxHeight / 2,
+            // overlayRadiusLat: droneMaxHeight / 2,
+            // overlayRadiusLng:
+            //   droneMaxHeight / 2 / getLngFactor(marker.getPosition().lat()),
+            overlayRadiusLat: plusFactor / 2,
             overlayRadiusLng:
-              droneMaxHeight / 2 / getLngFactor(marker.getPosition().lat()),
+              plusFactor / 2 / getLngFactor(marker.getPosition().lat()),
+
+            ovelayPhotoRadiusLat: plusFactor,
+            ovelayPhotoRadiusLng: plusFactor / getLngFactor(marker.getPosition().lat()),
             direction: Math.PI / 2,
             maxHeight: droneMaxHeight,
             batteryCharge: 2000,
@@ -354,14 +359,6 @@ class MyMap extends Component {
         // FIXME: not customizable at all
       }
     );
-
-    // TODO: Delete map element
-    // window.google.maps.event.addListener(drawingManager, 'overlaycomplete', (event) => {
-    //   var element = event.overlay;
-    //   window.google.maps.event.addListener(element, 'click', (e) => {
-    //     element.setMap(null);
-    //   });
-    // });
 
     window.google.maps.event.addListener(
       drawingManager,
@@ -440,38 +437,21 @@ class MyMap extends Component {
       this.state.drone.findClosestPoint(this.state.field.bounds.toArray())
     );
 
-    // MainCalculation()
-
     let { field, drone, base } = this.state;
     field.setRadiuses(drone.overlayRadiusLat, drone.overlayRadiusLng);
     // field.setRadiuses(0.00134999999999863, 0.00134999999999863);
     field.distributeOnSquares();
     await field.createMap();
     this.state.drone.setField(field);
-    console.log("FIELD :", field);
 
-    // MAP REDUX
-    // const logoPath = '/path/to/my/image.png';
-
-    // const logo = fs.readFileSync(logoPath).toString('base64');
-    // this.props.setMapPath(field.photosMap.path);
-    console.log("field.photosMap.mapImg :", field.photosMap.mapImg);
-
-    console.log("field :", field.squaresArray);
     const composedPath = [];
     let composedPathBack;
 
-    console.log("field.SquaresArray :", field.SquaresArray);
     for (let [y, p] of field.squaresArray.entries()) {
       let reversed = y % 2 !== 0;
       if (reversed) {
         p = p.reverse();
-        // let copiedP = p.reverse();
-        // for(let i = 0; i < arrr.length; i++) {
-        //   composedArr.push({ p: arrReversed[i].p, ...arrr[i]})
-        // }
       }
-      console.log("p :", p);
 
       for (let [x, pp] of p.entries()) {
         let vpp = drone.mapToCenter(mapToVector(pp.bounds.center));
@@ -480,7 +460,7 @@ class MyMap extends Component {
           drone.overlayRadiusLat,
           drone.overlayRadiusLng
         );
-        console.log("x, y :", x, y);
+
         const isInside = field.isRectInside(rect);
 
         if (isInside) {
@@ -521,14 +501,18 @@ class MyMap extends Component {
         this.update.call(this);
       }, 1);
     }
-    // requestAnimationFrame(this.update.call(this));
   }
 
   render() {
     const { labels, currentLabelIdx, readyForStart } = this.state;
     let that = this;
     return (
-      <div className="relative">
+      <div
+        className="relative"
+        style={{
+          top: "-8px"
+        }}
+      >
         <div
           id="help-container"
           style={{ display: labels[currentLabelIdx] ? "flex" : "none" }}
@@ -592,7 +576,8 @@ let mapStateToProps = state => {
   // console.log("SHIT STATE :", state);
   return {
     photos: state.photos,
-    settings: state.settings
+    settings: state.settings,
+    droneParameters: state.droneParameters
   };
 };
 

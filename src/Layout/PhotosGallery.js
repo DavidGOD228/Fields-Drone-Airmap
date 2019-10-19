@@ -93,8 +93,8 @@ class PhotosGallery extends Component {
               .filter(el => el.sharpness > this.state.blurPercentage / 100)
               .map((f, idx) => (
                 <div
-                  className={`appear-anim photo-gallery-item ${this.state
-                    .expandedIdx === idx && "photo-gallery-item-expanded"}`}
+                  className={`photo-gallery-item ${this.state.expandedIdx ===
+                    idx && "photo-gallery-item-expanded"}`}
                   key={f.url + Math.random() * Math.random()}
                 >
                   <div

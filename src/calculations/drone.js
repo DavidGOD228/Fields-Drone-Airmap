@@ -41,8 +41,8 @@ class Drone {
     this.finishedFlight = false;
     this.photoBounds = Rectangle.newFromCenter(
       this.position,
-      this.overlayRadiusLat,
-      this.overlayRadiusLng
+      0.00268222365615145, // this.ovelayPhotoRadiusLat,
+      0.00268222365615145 // this.ovelayPhotoRadiusLng
     );
 
     this.photos = [];
@@ -160,7 +160,8 @@ class Drone {
     point,
     settings = {
       // size: '400x400',
-      size: `${this.dronePhotoDimentions.x + 2}x${this.dronePhotoDimentions.y}`,
+      // size: `${this.dronePhotoDimentions.x + 2}x${this.dronePhotoDimentions.y}`,
+      size: `${this.dronePhotoDimentions.x}x${this.dronePhotoDimentions.y}`,
       zoom: 18,
       maptype: "satellite",
       key: "AIzaSyBkDqO4ZFc9wLSfg-6qHo5xdAGusxTsRyI"

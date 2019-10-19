@@ -26,7 +26,7 @@ class App extends Component {
     super(props);
     this.state = {
       sidebarOn: 1,
-      menuOn: 0
+      menuOn: 1
     };
   }
 

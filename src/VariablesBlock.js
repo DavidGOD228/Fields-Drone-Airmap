@@ -13,13 +13,10 @@ class VariablesBlock extends Component {
     // console.log("e.target :", e.target.value);
 
     let val = e.target.value;
-    console.log("val :", val);
 
-    console.log("prop, e, this :", prop, e, this);
     switch (prop.type) {
       case "slider":
         this.props.updateDroneParameter(prop.name, val);
-        console.log("CHANGED");
         break;
 
       default:

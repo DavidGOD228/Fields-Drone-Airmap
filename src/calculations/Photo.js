@@ -7,6 +7,7 @@ const fs = window.require("fs");
 const http = window.require("http");
 const https = window.require("https");
 const path = window.require("path");
+var exec = window.require("child_process").exec;
 
 const se = window.require("sightengine")("540865617", "38b6kZYxVz6DyZLGv82G");
 
@@ -166,8 +167,25 @@ class Photo {
         console.log("err :", err);
       });
   }
-}
 
+  static uploadPhoto(path) {
+    exec(`imgur ${path}`, (err, stdout, stderr) => {
+      console.log("stdout: ", stdout);
+      console.log("stdout: ", err);
+      console.log("stdout: ", stderr);
+      // browser.close();
+    });
+    // let link = await exec(`imgur ${path}`);
+    // return link;
+  }
+}
+// (async () => {
+//   console.log(await Photo.uploadPhoto("../../Photos/Flight1/10.jpg"));
+// })();
+// Photo.uploadPhoto("../../Photos/Flight1/10.jpg");
+// Photo.uploadPhoto("/Photos/Flight23/8.jpg");
+// console.log("new File() :", new File("/Photos/Flight23/8.jpg"));
+// console.log("__dirname :", process.cwd());
 // (async () => {
 //   console.log("shit: ", await Photo.getFileBlurFactor("./4out.jpg"));
 // })();

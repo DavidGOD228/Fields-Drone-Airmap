@@ -1,14 +1,27 @@
-const Rembrandt = require("rembrandt/build/browser");
+// const Rembrandt = require("rembrandt/build/browser");
+import Rembrandt from "rembrandt";
 const mergeImg = window.require("merge-img");
 const mergeImages = window.require("merge-images");
 const Jimp = window.require("jimp");
+// const resemble = window.require("resemblejs");
+const { compare } = require("resemblejs");
+var looksSame = window.require("looks-same");
+
+// const resemble = require("../start").resemble;
+// console.log("compare :", resemble);
+console.log("compare :", compare);
 
 const fs = window.require("fs");
 const http = window.require("http");
 const https = window.require("https");
 const path = window.require("path");
+const util = window.require("util");
+
+var exec = window.require("child_process").exec;
 
 const se = window.require("sightengine")("540865617", "38b6kZYxVz6DyZLGv82G");
+
+const execOperation = util.promisify(exec);
 
 class Photo {
   constructor({ url }, additional) {
@@ -90,7 +103,6 @@ class Photo {
     let canvas = mainImg.mapImg;
     let jimps = [];
 
-    // FIXME: -1 is not right
     for (let i = 0; i < imgs.length; i++) {
       let j = await Jimp.read(imgs[i].src);
       jimps.push(j);
@@ -109,7 +121,6 @@ class Photo {
         canvas.composite(j, imgs[idx].x, y);
       }
     }
-    //this.inverceColor(canvas);
 
     canvas.write(outputPath, () => console.log("DONE COMPOSING"));
     let inverted = await Photo.inverceColor(canvas);
@@ -129,9 +140,10 @@ class Photo {
   }
 
   static async comparingImages(filepathA, filepathB) {
-    var tempA = filepathA;
-    var tempB = filepathB;
+    var tempA = fs.readFileSync(filepathA);
+    var tempB = fs.readFileSync(filepathB);
 
+    console.log("tempA, tempB :", tempA, tempB);
     const rembrandt = new Rembrandt({
       imageA: tempA,
       imageB: tempB,
@@ -142,7 +154,8 @@ class Photo {
       renderComposition: true, // Should Rembrandt render a composition image?
       compositionMaskColor: Rembrandt.Color.RED // Color of unmatched pixels
     });
-
+    console.log("rembrandt :", rembrandt);
+    // console.log("rembrandt.compare() :", rembrandt.compare());
     rembrandt
       .compare()
       .then(result => {
@@ -166,12 +179,103 @@ class Photo {
         console.log("err :", err);
       });
   }
+
+  static uploadPhoto(path) {
+    return execOperation(`imgur ${path}`).then((one, two, three) => {
+      return one.stdout;
+    });
+  }
+
+  // static resembleCompare(path1, path2) {
+  //   resemble.outputSettings({
+  //     largeImageThreshold: 0
+  //   });
+  //   var diff = resemble(path1)
+  //     .compareTo(path2)
+  //     .ignoreColors()
+  //     .onComplete(data => {
+  //       console.log(data);
+  //       // var png = data.getDiffImage();
+  //       // var buf = new Buffer([]);
+  //       // var strm = png.pack();
+  //       // strm.on("data", function(dat) {
+  //       //   buf = Buffer.concat([buf, dat]);
+  //       // });
+  //       // strm.on("end", function() {
+  //       //   fs.writeFile("diff.png", buf, null, function(err) {
+  //       //     if (err) {
+  //       //       throw "error writing file: " + err;
+  //       //     }
+  //       //     console.log("file written");
+  //       //   });
+  //       // });
+  //       // res.render('compare');
+  //     });
+  // }
+  static comparePixelMatch(
+    path1,
+    path2,
+    comparePath,
+    { tolerance, antialiasingTolerance, ignoreAntialiasing, ignoreCaret }
+  ) {
+    looksSame.createDiff(
+      {
+        reference: path1,
+        current: path2,
+        diff: comparePath,
+        highlightColor: "#ff00ff", // color to highlight the differences
+        strict: false, // strict comparsion
+        tolerance: tolerance || 20,
+        antialiasingTolerance: antialiasingTolerance || 0,
+        ignoreAntialiasing: ignoreAntialiasing || true, // ignore antialising by default
+        ignoreCaret: ignoreCaret || true // ignore caret by default
+      },
+      error => {}
+    );
+  }
 }
 
-// (async () => {
-//   console.log("shit: ", await Photo.getFileBlurFactor("./4out.jpg"));
-// })();
+// Photo.comparePixelMatch(
+//   "./Photos/Flight20/4.jpg",
+//   "./Photos/Flight20/2.jpg",
+//   "./Photos/Flight20/shit.jpg"
+// );
 
-// Photo.getFileBlurFactor('./4out.jpg').then(res => console.log('res :', res));
+// Photo.comparingImages("./Photos/Flight20/4.jpg", "./Photos/Flight20/4.jpg");
+// Photo.resembleCompare("./Photos/Flight20/4.jpg", "./Photos/Flight20/4.jpg");
+
+// function getDiff(image1, image2) {
+//   const options = {
+//     returnEarlyThreshold: 5
+//   };
+
+//   compare(image1, image2, options, function(err, data) {
+//     if (err) {
+//       console.log("An error!");
+//     } else {
+//       console.log(data);
+//     }
+//   });
+// }
+
+// getDiff("./Photos/Flight20/4.jpg", "./Photos/Flight20/4.jpg");
+
+// looksSame(
+//   "./Photos/Flight20/4.jpg",
+//   "./Photos/Flight20/3.jpg",
+//   (error, { equal }) => {
+//     console.log("equal :", equal);
+//     // equal will be true, if images looks the same
+//   }
+// );
+
+(async () => {
+  let val = await Photo.uploadPhoto("./Photos/Flight20/4.jpg");
+  console.log("val :", val);
+  // Photo.comparingImages(val, val);
+  // Photo.comparingImages("./Photos/Flight20/4.jpg", "./Photos/Flight20/4.jpg");
+})();
+
+// Photo.compareImages("./Photos/Flight20/4.jpg", "./Photos/Flight20/4.jpg");
 
 export default Photo;

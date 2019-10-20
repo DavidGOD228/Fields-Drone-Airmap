@@ -225,7 +225,7 @@ class Photo {
         diff: comparePath,
         highlightColor: "#ff00ff", // color to highlight the differences
         strict: false, // strict comparsion
-        tolerance: tolerance || 20,
+        tolerance: tolerance || 10,
         antialiasingTolerance: antialiasingTolerance || 0,
         ignoreAntialiasing: ignoreAntialiasing || true, // ignore antialising by default
         ignoreCaret: ignoreCaret || true // ignore caret by default
